@@ -29,13 +29,10 @@ class stream extends ovm_object;
 
    rand int adif_id; 
    constraint adif_id_range {
-     adif_id dist { [0:20] };
+     adif_id dist { 32'h41444946 :/ 9};
    }
    
    rand bit copyright_id_present; 
-   constraint copyright_id_present_range {
-     copyright_id_present dist { [0:1] };
-   }
    
    rand bit[71:0] copyright_id; 
    constraint copyright_id_range {
@@ -43,19 +40,10 @@ class stream extends ovm_object;
    }
    
    rand bit original_copy; 
-   constraint original_copy_range {
-     original_copy dist { [0:1] };
-   }
    
    rand bit home; 
-   constraint home_range {
-     home dist { [0:1] };
-   }
    
    rand bit bitstream_type; 
-   constraint bitstream_type_range {
-     bitstream_type dist { [0:1] };
-   }
    
    rand bit[22:0] bitrate; 
    constraint bitrate_range {
@@ -64,7 +52,7 @@ class stream extends ovm_object;
    
    rand bit[3:0] num_program_config_elements; 
    constraint num_program_config_elements_range {
-     num_program_config_elements dist { [0:15] };
+     num_program_config_elements dist {  0 :/ 9 };
    }
    
    rand bit[19:0] adif_buffer_fullness; 
@@ -81,7 +69,7 @@ class stream extends ovm_object;
 // ### INICIO RAW_DATA_STREAM
 // Suficiente para 10s de audio
 // 44.1k * 10s / 1024 amostras = 431
-	rand raw_data_block raw_data_block[2:0];
+	rand raw_data_block raw_data_block[1:0];
 
 // ### INICIO RAW_DATA_STREAM
 
@@ -89,7 +77,7 @@ class stream extends ovm_object;
 		for(int i=0; i<3;i++)begin
 			pce[i] = new;
 		end
-		for(int i=0; i<3;i++)begin
+		for(int i=0; i<2;i++)begin
 			raw_data_block[i] = new;
 		end
 	endfunction
