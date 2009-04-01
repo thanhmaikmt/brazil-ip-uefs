@@ -1,0 +1,758 @@
+******** eTBc ***********
+eTBc LOG FILE
+Date:Jan 27 2009
+Time:19:25:15
+*************************
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:bit
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:byte
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:shortint
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:int unsigned
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:longint
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:shortreal
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+TYPE MAPPING BEGIN
+
+TYPE MAPPING END:real
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+$$(module.in) BEGIN
+
+$$(module.in) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+FILE BEGIN
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+FILE ARGUMENTS BEGIN
+
+FILE ARGUMENTS END
+
+CURRENT FILE NAME:in_huffman_driver.svh
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+
+  class 
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_driver extends ovm_threaded_component;
+
+    ovm_get_port #(
+
+$$(i.type) BEGIN
+
+$$(i.type) END:huffman_input
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:) 
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_from_source;
+    
+
+$$(i.type) BEGIN
+
+$$(i.type) END:huffman_input
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: p_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:;
+    
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(var) BEGIN
+
+$$(var) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+    
+
+$$(i.type) BEGIN
+
+$$(i.type) END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codeword
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:;
+    
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+    
+
+$$(i.type) BEGIN
+
+$$(i.type) END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codebook
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:;
+    
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+    
+
+$$(i.type) BEGIN
+
+$$(i.type) END:int
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:globalGain
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:;
+    
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+    function new(string name, ovm_component parent);
+      super.new(name,parent);
+
+      
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_from_source = new("
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_from_source", this);
+      
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(var) BEGIN
+
+$$(var) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+      fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codeword
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: = 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$sdi_create_fiber("Driver", "TVM", "top");
+      
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+      fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codebook
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: = 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$sdi_create_fiber("Driver", "TVM", "top");
+      
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+      fiber_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:globalGain
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: = 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$sdi_create_fiber("Driver", "TVM", "top");
+      
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+    endfunction
+
+    task run();
+
+      delay d = new;
+
+      
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_valid <= 0;
+      @(posedge clk);
+      while(reset) @(posedge clk);
+      while(1) begin
+
+        
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_from_source.get(p_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:);
+        p_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:.rec_begin(fiber_
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+$$(var) BEGIN
+
+$$(var) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codeword
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codebook
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:globalGain
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:,"
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:");
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(signal) BEGIN
+
+$$(signal) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:clock
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:reset
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:acionar
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codebook
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:globalGain
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+          
+
+$$(j.name) BEGIN
+
+$$(j.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codeword
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: 
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END: <= p_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:.
+
+$$(foreach) BEGIN
+
+$$(foreach) END
+
+$$(var) BEGIN
+
+$$(var) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codeword
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:codebook
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+$$(i.name) BEGIN
+
+$$(i.name) END:globalGain
+
+$$(endfor) BEGIN
+
+$$(endfor) END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:;
+          
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_valid <= 1;
+          @(posedge clk);
+          while(!
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_ready) @(posedge clk);
+        p_
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:.rec_end();
+          
+
+$$(i.name) BEGIN
+
+$$(i.name) END:in_huffman
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:_valid  <= 0;
+          assert(d.randomize());
+          repeat(d.d) @(posedge clk);
+      end
+    endtask
+  endclass
+
+
+
+END FILE BEGIN
+
+END FILE END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+
+
+$$(endfor) BEGIN
+
+$$(endfor) END
