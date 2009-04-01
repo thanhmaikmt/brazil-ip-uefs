@@ -118,7 +118,7 @@ class refmod_decodificadorAAC extends ovm_component;
 		
 		for(int i=0; i< 64 ; i++) begin			
 			coef = tr_in_entrada.raw_data_block[0].sce[0].ics.spectral_data.hcod[0][0][i];
-			//$display("###### REFMOD : hcod[0][0][%d] = %d", i, coef );
+			//$display("###### Scalfactor[%d] = %d ", i, raw.sce[0].ics.scale_factor_data.scalefactors[0][i] );
 			tr_out_amostra.amostra = coef;
 			crm.sample();
 			amostra_stim.put(tr_out_amostra);

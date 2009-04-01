@@ -8,9 +8,9 @@
 
 class raw_data_block extends ovm_object;
 	rand bit[123:0][2:0] id_syn_ele;
-   constraint id_syn_ele_range {
-     id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
-   }
+   //constraint id_syn_ele_range {
+   //  id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
+   //}
    
    /*
     ID_name encoding Abbreviation Syntactic Element
@@ -36,6 +36,10 @@ class raw_data_block extends ovm_object;
 			//dse[i] = new;
 			//fill[i] = new;
 			pce[i] = new;
+		end
+		
+		for(int i=0; i<124;i++)begin
+			id_syn_ele[i] = $urandom_range(7,0);
 		end
 	endfunction
 	
