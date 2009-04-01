@@ -15,6 +15,7 @@ class sink extends ovm_component;
        
        while(1) begin
           amostra_from_refmod.get(tr_amostra);
+		  $display("Amostra recebida do RefMod = %d" , tr_amostra.amostra);
           
        end
     endtask
