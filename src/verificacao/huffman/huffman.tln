@@ -1,0 +1,60 @@
+struct huffman_input {
+	trans
+	{
+		int codeword; //palavra de código de huffman - corresponde a um fator de escala ou um coeficiente espectral;
+		int codebook; //qual livro de codigo a ser usado (ISO/IEC 13818-7 ANEXO A)
+		int globalGain; //ganho global, para o caso dos fatores de escala
+	}
+	signals
+	{
+		bool clock;  
+		bool reset;  
+		bool acionar;  
+		unsigned[4] codebook;  // para conferir o tamanho
+		unsigned[8] globalGain;  // para conferir o tamanho
+		bool codeword;  //bits do bitstream que correspondem a um fator de escala ou coeficiente espectral
+	}
+}
+
+struct huffman_output {
+	trans
+	{ 
+	//w e x são usados apenas para livros de código com 4 coeficientes
+		int w; //primeiro coeficiente (para spectral_data) ou primeiro fator de escala (para scale_factor_data)
+		int x; //segundo coeficiente
+		int y; //terceiro coeficiente (para codebook quadruplo) e primeiro coeficiente (para codebook duplo) 
+		int z; //quarto coeficiente  (para codebook quadruplo) e segundo coeficiente (para codebook duplo)
+	}
+	signals
+	{
+		unsigned[64] dados;
+		/*
+		O fator de escala é representado pelos 12 bits mais significiativos - valor maximo = 3195
+		O primeiro coeficiente (w) é representado pelos 16 bits mais significativos -> dados[63:47]
+		O ultimo coeficiente (z) é representado pelos 16 bits menos significativos -> dados[15:0]
+		*/
+		
+		bool armazenarPacote;
+	}
+}
+
+module huffman
+{
+	input huffman_input in_huffman;
+	output huffman_output out_huffman;
+}
+
+/* COMANDOS
+cds
+unset ETBC_TLN_DIR
+etbc huffman.tln trans huffman
+etbc huffman.tln sdi huffman
+etbc huffman.tln pre_source huffman
+etbc huffman.tln sink huffman
+etbc huffman.tln refmod huffman
+etbc huffman.tln tb_single_refmod huffman
+etbc huffman.tln tb_tcl huffman
+etbc huffman.tln Makefile_single_refmod huffman
+
+*/
+
