@@ -14,7 +14,7 @@ class AACHuffmanDecoder extends ovm_object;
 		//$display("Instanciou HuffmanDecoder para codebook %d", codebookNumber );
       codebook = codebookNumber;
    endfunction
-	
+
 	function int decode(int codeword);
 
 		//LIVROS DE CÓDIGO NO ANEXO A DA ISO IEC 13818-7
@@ -161,15 +161,8 @@ class AACHuffmanDecoder extends ovm_object;
 					
 				endcase
 
-		   end
-		   
-		   
-		   0: //não há transmissão de fatores de escala nem de coeficientes
-		   begin
-				
-		   end
-		   
-		   
+		   end		   		
+
 		   1:  //livro dos coeficientes TABLE A.2		   
 		   begin
 				case(codeword)

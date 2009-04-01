@@ -87,9 +87,11 @@ class refmod_huffman extends ovm_component;
 				 nReceivedScalefactors++;
 		   end
 		   		   
-		   0: //não há transmissão de fatores de escala nem de coeficientes
-		   begin
-				$display( "Livro de código 0!!! ");
+		   0: 	//nao ha transmissao de fatores de escala nem de coeficientes	   
+		   begin									
+				dim=0;
+				lav=0;
+				$display( "Livro de codigo 0!!!");
 		   end		   
 		   
 		   1:  //livro dos coeficientes TABLE A.2		   
@@ -181,7 +183,7 @@ class refmod_huffman extends ovm_component;
 		   end
 		endcase
 		
-		$display( "CODEBOOK: %d | CODEWORD: %h | INDEX: %d",  codebook ,tr_in_in_huffman.codeword, index);
+		//$display( "CODEBOOK: %d | CODEWORD: %h | INDEX: %d",  codebook ,tr_in_in_huffman.codeword, index);
 		if (isUnsignedCodebook) begin
 			mod = lav + 1;
 			off = 0;
@@ -203,7 +205,7 @@ class refmod_huffman extends ovm_component;
 				nReceivedCoefs += 4;
 				
 			end
-			else begin
+			else if(dim == 2) begin
 				tr_out_out_huffman.y = index/mod - off;
 				index -= (tr_out_out_huffman.y+off)*mod;
 				tr_out_out_huffman.z = index - off;
