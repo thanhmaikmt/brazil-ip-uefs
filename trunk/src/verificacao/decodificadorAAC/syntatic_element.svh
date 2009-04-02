@@ -9,7 +9,7 @@ class syntatic_element extends ovm_object;
    }
    
    function string psprint();
-      psprint = $psprintf(" ## SYNTATIC_ELEMENT : id_syn_ele = %d", id_syn_ele);
+      psprint = $psprintf(" ## SYNTATIC_ELEMENT : element_instance_tag = %d", element_instance_tag);
    endfunction
 
 endclass 
