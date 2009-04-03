@@ -19,13 +19,12 @@ class sink extends ovm_component;
        while(1) begin
 			erro_from_refmod.get(tr_erro);
 			if(tr_erro.erro != 0) begin
-			$display("###CHECKER");
 			  case(tr_erro.erro)
-						1 : $display("######ERRO: ADIF_ID INCORRETO!! ");
-						2 : $display("######ERRO: BITSTREAM VARIAVEL!! ");
-						3: $display("######ERRO: BITRATE INADEQUADO!!");
-						4: $display("######ERRO: MAIS DE UMA CONFIGURACAO DE PROGRAMA!!");
-						default: $display("######ERRO: INFORMAÇÃO INESPERADA NO STREAM!! ");
+						1 : $display("######CHECKER -> ERRO: ADIF_ID INCORRETO!! ");
+						2 : $display("######CHECKER -> ERRO: BITSTREAM VARIAVEL!! ");
+						3: $display("######CHECKER -> ERRO: BITRATE INADEQUADO!!");
+						4: $display("######CHECKER -> ERRO: MAIS DE UMA CONFIGURACAO DE PROGRAMA!!");
+						default: $display("######CHECKER -> ERRO: INFORMAÇÃO INESPERADA NO STREAM!! ");
 						
 			 endcase
 			 continue;

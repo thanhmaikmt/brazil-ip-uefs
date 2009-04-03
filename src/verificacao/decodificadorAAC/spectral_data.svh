@@ -7,7 +7,18 @@ class spectral_data extends ovm_object;
 	 //
 	 //maximo de 8 grupos, cada grupo com um maximo de 49 secoes, cada secao podera ter no maximo 512 coeficientes, caso seja sempre usado livro de codigo duplo!
 	//rand bit[15:0] hcod[7:0][48:0][511:0];
-	rand bit[1:0][1:0][63:0][15:0] hcod;
+	rand bit[15:0] hcod[1:0][1:0][63:0];
+	/*
+	constraint c {
+		foreach (hcod[i]) // For every element
+			foreach (hcod[j])
+				foreach (hcod[h])
+					hcod[i][j][h] inside { [0:255] };
+//foreach(hcod[a,b,c]) hcod[a,b,c] inside { [0:255] };
+		}
+		*/
+
+	//constraint hcod_range {foreach (hcod[i,j,k]) hcod[i,j,k] dist { [0:255] };}
 	//constraint hcod_range {
      //hcod dist { [0:255] };
     //}
