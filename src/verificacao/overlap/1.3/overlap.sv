@@ -5,8 +5,7 @@ module overlap(input reset, clk,
   input in_overlap_valid,
   output logic in_overlap_ready,
   input  [64:0] in_overlap_pcmSample,
-  input in_overlap_valid,
-  output logic in_overlap_ready,  
+
   output logic  [64:0] out_overlap_pcmSample,
   output logic out_overlap_valid,
   input out_overlap_ready);
