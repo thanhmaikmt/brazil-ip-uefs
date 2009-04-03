@@ -55,8 +55,8 @@ class refmod_decodificadorAAC extends ovm_component;
 		end
 		else begin
 			max_sfb = ics_info.max_sfb_long;
-			if(ics_info.predictor_data_present) //presença de predição
-				tr_out_erro.erro = 5;
+			//if(ics_info.predictor_data_present) //presença de predição
+			//	tr_out_erro.erro = 5;
 		end
 		
 	endtask
@@ -64,9 +64,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	 task handle_ics(individual_channel_stream ics);
 		handle_ics_info(ics.ics_info);
 		//TESTE - envia os coefs para o checker
-		coef = ics.spectral_data.hcod[1][1][0];
-		$display("### coef = %d", coef);
-		/*
+
 		for(int i=0; i< 64 ; i++) begin			
 			coef = ics.spectral_data.hcod[1][1][i];
 			tr_out_amostra.amostra = coef;
@@ -74,7 +72,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			erro_stim.put(tr_out_erro);
 			amostra_stim.put(tr_out_amostra);			
 		end
-		*/
+		
 		handle_section_data(ics.section_data);
 	endtask
 	
@@ -87,7 +85,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			sect_esc_val = (1<<5) -1;
 			
 		//ler as informações relatias a um ics_info()
-		for(int g=0; g< num_window_groups ; i++) begin	
+		for(int g=0; g< num_window_groups ; g++) begin	
 			k = 0;
 			i = 0;
 			while(k < max_sfb) begin
@@ -175,6 +173,7 @@ class refmod_decodificadorAAC extends ovm_component;
 							
 						1 : //ID_CPE
 							begin
+								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO CPE!! : \n");
 								handle_ics(ics);
 								handle_ics(ics);
