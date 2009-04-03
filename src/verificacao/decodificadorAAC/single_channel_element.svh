@@ -8,7 +8,7 @@ class single_channel_element extends syntatic_element;
 	rand individual_channel_stream ics = new;
 
 	function string psprint();
-      psprint = $psprintf("ID_SYN_ELE: %d | %s ", id_syn_ele ,ics.psprint());
+      psprint = $psprintf("ICS:  %s ", ics.psprint());
    endfunction
    
 endclass 

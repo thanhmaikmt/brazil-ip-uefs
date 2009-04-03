@@ -82,19 +82,19 @@ class stream extends ovm_object;
 		end
 	endfunction
 
-/*
+
    function integer equal(stream tr);
       equal = (this.adif_id == tr.adif_id) && (this.copyright_id_present == tr.copyright_id_present) && (this.copyright_id == tr.copyright_id) && (this.original_copy == tr.original_copy) && (this.home == tr.home) && (this.bitstream_type == tr.bitstream_type) && (this.bitrate == tr.bitrate) && (this.num_program_config_elements == tr.num_program_config_elements) && (this.adif_buffer_fullness == tr.adif_buffer_fullness);
    endfunction
-*/
+
    function string psprint();
-      psprint = $psprintf("adif_id= %d | copyright_id_present = %d | copyright_id= %d | original_copy = %d | home= %d | bitstream_type = %d | bitrate= %d | num_program_config_elements = %d | adif_buffer_fullness= %d \n%s \n%s", adif_id, copyright_id_present, copyright_id, original_copy , home, bitstream_type, bitrate, num_program_config_elements,adif_buffer_fullness, pce[0].psprint(), raw_data_block[0].psprint());
+      psprint = $psprintf("adif_id= %x | copyright_id_present = %d | copyright_id= %d | original_copy = %d | home= %d | bitstream_type = %d | bitrate= %d | num_program_config_elements = %d | adif_buffer_fullness= %d \n%s \n%s", adif_id, copyright_id_present, copyright_id, original_copy , home, bitstream_type, bitrate, num_program_config_elements,adif_buffer_fullness, pce[0].psprint(), raw_data_block[0].psprint());
    endfunction
 
 
    function bit read(int file);
       if (file && !$feof(file))
-        read = 0 != $fscanf(file, "%d %d %d %d %d %d %d %d %d %s", this.adif_id, this.copyright_id_present, this.copyright_id, this.original_copy, this.home, this.bitstream_type, this.bitrate, this.num_program_config_elements, this.adif_buffer_fullness, pce[0].psprint());
+        read = 0 != $fscanf(file, "%d %d %d %d %d %d %d %d %d", this.adif_id, this.copyright_id_present, this.copyright_id, this.original_copy, this.home, this.bitstream_type, this.bitrate, this.num_program_config_elements, this.adif_buffer_fullness);
       else read = 0;    
    endfunction
 
@@ -110,7 +110,6 @@ class stream extends ovm_object;
 endclass
 /***********************************/
 
-   /***********************************/
    function void record_set_amostra(int reco , int amostra);
       // optionaly use format specifier as 3rd argument of sdi_set_attribute 
       $sdi_set_attribute(reco, amostra);
@@ -120,26 +119,23 @@ endclass
 class amostra extends ovm_object;
    int record;
     
-   rand int amostra; 
-   constraint amostra_range {
-     amostra dist { [0:65536] };
-   }
-   
-/*
+   int amostra; 
+
+   /*
    function integer equal(amostra tr);
       equal = (this.amostra == tr.amostra);
    endfunction
 
    function string psprint();
-      psprint = $psprintf("(amostra= %d)",amostra);
-   endfunction
-*/
-   function bit read(int file);
-      if (file && !$feof(file))
-        read = 0 != $fscanf(file, "%d ", this.amostra);
-      else read = 0;    
+      psprint = $psprintf("(amostra= %d)", amostra);
    endfunction
 
+   function bit read(int file);
+      if (file && !$feof(file))
+        read = 0 != $fscanf(file, "%d", this.amostra);
+      else read = 0;    
+   endfunction
+*/
    task rec_begin(int fiber, string label);
       record = record_begin(fiber, label);
    endtask
@@ -150,6 +146,50 @@ class amostra extends ovm_object;
    endtask
 
 endclass
+
+/***********************************/
+
+   function void record_set_erro(int reco ,  int erro);
+      // optionaly use format specifier as 3rd argument of sdi_set_attribute 
+	  $sdi_set_attribute(reco, erro);
+   endfunction
+
+
+class erro extends ovm_object;
+   int record;
+    
+   int erro; 
+
+   /*
+   function integer equal(erro tr);
+      equal = (this.erro == tr.erro);
+   endfunction
+
+   function string psprint();
+      psprint = $psprintf("(erro= %d)", erro);
+   endfunction
+
+   function bit read(int file);
+      if (file && !$feof(file))
+        read = 0 != $fscanf(file, "%d", this.erro);
+      else read = 0;    
+   endfunction
+*/
+   task rec_begin(int fiber, string label);
+      record = record_begin(fiber, label);
+   endtask
+
+   task rec_end();
+      record_set_erro(record,erro);
+      record_end(record);
+   endtask
+
+endclass
+
+
+
+   /***********************************/
+
    /***********************************/
 
 class delay; // used for delay in signal handshake

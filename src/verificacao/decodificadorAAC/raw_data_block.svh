@@ -7,7 +7,9 @@
 `include "program_config_element.svh"
 
 class raw_data_block extends ovm_object;
-	rand bit[123:0][2:0] id_syn_ele;
+	rand bit[2:0] id_syn_ele[123:0];
+
+	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 2, 1 :/ 2, [2:3] :/1 , [4:6] :/ 2, 7 :/ 5 };}
    //constraint id_syn_ele_range {
    //  id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
    //}
@@ -37,10 +39,7 @@ class raw_data_block extends ovm_object;
 			//fill[i] = new;
 			pce[i] = new;
 		end
-		
-		for(int i=0; i<124;i++)begin
-			id_syn_ele[i] = $urandom_range(7,0);
-		end
+
 	endfunction
 	
 	function string psprint();

@@ -29,14 +29,22 @@ struct amostra{
 	signals {	
 		signed [16] amostra;
 	}
+}
 
+struct erro{
+	trans{
+		int erro;
+	}
+	signals {	
+		unsigned [4] erro;
+	}
 }
 
 module decodificadorAAC
 {
 	input stream entrada;
 	output amostra amostra;
-
+	output erro erro;
 }
 
 /*
