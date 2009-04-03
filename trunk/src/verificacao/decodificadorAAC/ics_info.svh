@@ -8,24 +8,29 @@ class ics_info extends ovm_object;
 	rand bit window_shape; // 1 bit
 		
 	
-	//if (window_sequence == EIGHT_SHORT_SEQUENCE) {
-	rand bit[3:0] max_sfb_1; //4 bits
-	rand bit[6:0] scale_factor_grouping; //7 bits
-	//}
-	//else {
-	rand bit[5:0] max_sfb_2; //6 bits
-	rand bit predictor_data_present; //1 bits
-	//if (predictor_data_present) {
-	rand bit predictor_reset; //1 bits
-	//if (predictor_reset) {
-	rand bit[4:0] predictor_reset_group_number; //5 bits
-	//}
-	//for (sfb = 0; sfb < min(max_sfb,PRED_SFB_MAX); sfb++) {
-	rand bit[48:0] prediction_used; //1 bits
-	//}
-	//}
-	//}
 
+	rand bit[3:0] max_sfb_short; //4 bits
+	rand bit[6:0] scale_factor_grouping; //7 bits
+
+	rand bit[5:0] max_sfb_long; //6 bits
+	rand bit predictor_data_present; //1 bits
+
+	rand bit predictor_reset; //1 bits
+
+	rand bit[4:0] predictor_reset_group_number; //5 bits
+
+	rand bit[48:0] prediction_used; //1 bits
+
+	function int get_num_window_groups();
+		int num_groups = 1;
+		for(int i =0; i <= 6; i++)begin
+			if(scale_factor_grouping[i] == 1'b0)
+				num_groups++;
+		end
+		//$display("sf_grouping = %b | num_groups = %d",scale_factor_grouping, num_groups );
+		return num_groups;
+	endfunction
+	
 	function string psprint();
       psprint = $psprintf(" ##ICS_INFO : window_sequence = %d" , window_sequence );
    endfunction

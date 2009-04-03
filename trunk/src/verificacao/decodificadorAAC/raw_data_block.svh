@@ -9,7 +9,7 @@
 class raw_data_block extends ovm_object;
 	rand bit[2:0] id_syn_ele[123:0];
 
-	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 2, 1 :/ 2, [2:3] :/1 , [4:6] :/ 2, 7 :/ 5 };}
+	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 3, 1 :/ 1, [2:3] :/1 , [4:6] :/ 2, 7 :/ 3 };}
    //constraint id_syn_ele_range {
    //  id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
    //}
@@ -41,6 +41,57 @@ class raw_data_block extends ovm_object;
 		end
 
 	endfunction
+	
+	//ordena os elementos sintaticos de maneira a garantir q em um raw_data_block exista 2 SCE ou 1 CPE
+	task reorderSyntaticElements();
+		int nSCE = 0;
+		int nCPE = 0;
+		int sceIndex = 0;
+		for(int i=0; i<124;i++)begin
+			if(id_syn_ele[i] == 7 && (nSCE<2 || nCPE < 1)) begin
+				if(nSCE == 1) begin
+					id_syn_ele[i] = 0; //ID_SCE
+					nSCE++;
+				end
+				else begin
+					id_syn_ele[i] = 1; //ID_CPE
+					nCPE++;					
+				end
+				id_syn_ele[i+1] = 7; //ID_TERM
+				break;
+			end
+			else if(id_syn_ele[i] == 0) begin
+				if(nSCE == 2) begin
+					id_syn_ele[i] = 7; //ID_TERM
+					break;
+				end
+				else begin
+					nSCE++;
+					if(nSCE == 2) begin
+						id_syn_ele[i + 1] = 7; //ID_TERM
+						break;
+					end
+					else
+						sceIndex = i;
+				end	
+				
+			end
+			else if(id_syn_ele[i] == 1) begin
+				if(nCPE == 1) begin
+					id_syn_ele[i] = 7; //ID_TERM
+				end
+				else begin
+					nCPE++;
+					id_syn_ele[i + 1] = 7; //ID_TERM
+				end	
+				if(nSCE != 0)
+					id_syn_ele[sceIndex] = 4;
+				break;
+			end
+			//$display("id_syn_ele[%d] = %d", i , id_syn_ele[i] );
+		end
+
+	endtask
 	
 	function string psprint();
       psprint = $psprintf(" ## RAW_DATA_BLOCK :  %s", sce[0].psprint());
