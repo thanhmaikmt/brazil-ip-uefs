@@ -1,12 +1,11 @@
 
 
 module tb(input reset, clk,   
-  output logic bit [1:0] in_overlap_firstSequence,
+  output logic [1:0] in_overlap_firstSequence,
   output logic in_overlap_valid,
   input in_overlap_ready,
   output logic  [64:0] in_overlap_pcmSample,
-  output logic in_overlap_valid,
-  input in_overlap_ready,  
+
   input  [64:0] out_overlap_pcmSample,
   input out_overlap_valid,
   output logic out_overlap_ready );

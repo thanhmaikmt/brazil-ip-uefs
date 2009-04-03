@@ -32,9 +32,14 @@
       while(1) begin
 
         in_overlap_from_source.get(p_in_overlap);
-        p_in_overlap.rec_begin(fiber_pcmSamplefirstSequence,"in_overlap");  
-          in_overlap_firstSequence  
-          in_overlap_pcmSample  <= p_in_overlap.pcmSamplefirstSequence;
+        //p_in_overlap.rec_begin(fiber_pcmSamplefirstSequence,"in_overlap");  
+        p_in_overlap.rec_begin(fiber_pcmSample, "in_overlap");  
+        p_in_overlap.rec_begin(fiber_firstSequence,"in_overlap");  
+
+	 //corrigindo o bug
+          in_overlap_firstSequence  <= p_in_overlap.firstSequence;
+
+          in_overlap_pcmSample  <= p_in_overlap.pcmSample;
           in_overlap_valid <= 1;
           @(posedge clk);
           while(!in_overlap_ready) @(posedge clk);

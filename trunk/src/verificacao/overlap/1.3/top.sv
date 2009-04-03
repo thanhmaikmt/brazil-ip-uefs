@@ -5,7 +5,7 @@ module top;
 
    
    
-  logic bit [1:0] in_overlap_firstSequence;
+  logic [1:0] in_overlap_firstSequence;
   
   logic  [64:0] in_overlap_pcmSample;
   
