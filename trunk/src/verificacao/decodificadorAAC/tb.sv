@@ -13,7 +13,8 @@ module tb;
   
   tlm_fifo #(amostra) amostra_refmod_checker = new("amostra_refmod_checker", null, 3);
   
-
+  tlm_fifo #(erro) erro_refmod_checker = new("erro_refmod_checker", null, 3);
+	
   initial begin
      
      pre_source_i.entrada_to_refmod.connect(entrada_source_refmod.put_export);
@@ -22,6 +23,9 @@ module tb;
      
      refmod_decodificadorAAC_i.amostra_stim.connect(amostra_refmod_checker.put_export);
      sink_i.amostra_from_refmod.connect(amostra_refmod_checker.get_export);
+	 
+	 refmod_decodificadorAAC_i.erro_stim.connect(erro_refmod_checker.put_export);
+     sink_i.erro_from_refmod.connect(erro_refmod_checker.get_export);
      
      $shm_open("waves.shm");
      run_test();
