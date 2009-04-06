@@ -12,7 +12,7 @@ class channel_pair_element extends syntatic_element;
 	//ms_used[g][sfb]
 	rand bit[7:0][48:0] ms_used;
 	
-	rand individual_channel_stream ics = new;
+	rand individual_channel_stream ics1 = new;
 	rand individual_channel_stream ics2 = new;
 
 	function string psprint();

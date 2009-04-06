@@ -1,3 +1,4 @@
+`include "AACHuffmanDecoder.svh"
 
 class refmod_decodificadorAAC extends ovm_component;
 
@@ -32,18 +33,24 @@ class refmod_decodificadorAAC extends ovm_component;
 	
    //enum { ID_SCE, ID_CPE, ID_CCE, ID_LFE, ID_DSE, ID_PCE, ID_FIL, ID_END } id_syn_ele;
    //parameter int EIGHT_SHORT_SEQUENCE = 2;
+	AACHuffmanDecoder huffmanDecoder;
 	int id_syn_ele, global_gain, num_window_groups, max_sfb;
+	bit[7:0] scale_factor_grouping;
 	bit[1:0] window_sequence;
-	bit[3:0] sfb_codebook[7:0][48:0];
+	bit[3:0] sect_codebook[7:0][48:0]; //sect_codebook[g][i] => livro de codigo usado na secao i de um grupo g
+	bit[3:0] sfb_codebook[7:0][48:0]; //sfb_codebook[g][sfb] => livro de codigo usado na banda sfb de um grupo g
+	int sf[7:0][48:0]; //sf[g][sfb] => fatores de escala da banda sfb de um grupo g
+	int coefsR[1023:0]; //coeficientes espectrais
+	int coefsL[1023:0]; //coeficientes espectrais
 	bit window_shape;
-	int coef = 0;
 	int n_raw_data_block = 2;
 	raw_data_block raw;
 	int n_elements_in_raw = 0;
 	individual_channel_stream ics;
-	int sect_start[7:0][48:0];
-	int sect_end[7:0][48:0];
-	int num_sec[7:0];
+	channel_pair_element cpe;
+	int sect_start[7:0][48:0]; //sect_start[g][i] => indice da sfb que é o inicio da secao i de um grupo g
+	int sect_end[7:0][48:0]; //sect_end[g][i] => indice da sfb que é o final da secao i de um grupo g
+	int num_sec[7:0]; //num_sec[g] => numero de secoes do grupo g
 	
 
 	task handle_ics_info(ics_info ics_info);
@@ -51,45 +58,62 @@ class refmod_decodificadorAAC extends ovm_component;
 		window_shape = ics_info.window_shape;
 		if(window_sequence == 2) begin //EIGHT_SHORT_SEQUENCE
 			max_sfb = ics_info.max_sfb_short;
+			scale_factor_grouping = ics_info.scale_factor_grouping;
 			num_window_groups = ics_info.get_num_window_groups();
 		end
 		else begin
 			max_sfb = ics_info.max_sfb_long;
-			//if(ics_info.predictor_data_present) //presença de predição
-			//	tr_out_erro.erro = 5;
+			if(ics_info.predictor_data_present) begin//presença de predição
+				tr_out_erro.erro = 5;
+			end
 		end
 		
 	endtask
 	
-	 task handle_ics(individual_channel_stream ics);
-		handle_ics_info(ics.ics_info);
+	 task handle_ics(individual_channel_stream ics, bit common_window);
+		global_gain = ics.global_gain;
+		if (!common_window)
+			handle_ics_info(ics.ics_info);
+		
+		handle_section_data(ics.section_data);
+		handle_scale_factor_data(ics.scale_factor_data);
+		
+		if(ics.pulse_data_present)
+			tr_out_erro.erro = 5;
+		if(ics.tns_data_present)
+			tr_out_erro.erro = 5;
+		if(ics.gain_control_data_present)
+			tr_out_erro.erro = 5;
+			
+		handle_spectral_data(ics.spectral_data);
+		
+		/*	
 		//TESTE - envia os coefs para o checker
-
 		for(int i=0; i< 64 ; i++) begin			
-			coef = ics.spectral_data.hcod[1][1][i];
+			int coef = ics.spectral_data.hcod[1][1][i];
 			tr_out_amostra.amostra = coef;
 			crm.sample();
 			erro_stim.put(tr_out_erro);
 			amostra_stim.put(tr_out_amostra);			
 		end
+		//FIM TESTE
+		*/
 		
-		handle_section_data(ics.section_data);
 	endtask
 	
 	task handle_section_data(section_data sd);
+		//processa as informações relativas ao secionamento dos grupos
 		int k, i, sect_len, sect_len_incr, sect_esc_val, j;
-		bit[3:0] sect_cb;
 		if(window_sequence == 2) //EIGHT_SHORT_SEQUENCE
 			sect_esc_val = (1<<3) -1;
 		else
 			sect_esc_val = (1<<5) -1;
 			
-		//ler as informações relatias a um ics_info()
 		for(int g=0; g< num_window_groups ; g++) begin	
 			k = 0;
 			i = 0;
 			while(k < max_sfb) begin
-				sect_cb = sd.sect_cb[g][i];
+				sect_codebook[g][i] = sd.sect_cb[g][i];
 				sect_len = 0;
 				j = 0; //numero de incrementos dados.. foi determinado um maximo = 4
 				sect_len_incr =  sd.sect_len_incr[g][i][j];//FIXME
@@ -104,7 +128,7 @@ class refmod_decodificadorAAC extends ovm_component;
 				sect_start[g][i] = k;
 				sect_end[g][i] = k + sect_len;
 				for(int sfb=k; sfb<k+sect_len; sfb++) begin
-					sfb_codebook[g][sfb] = sect_cb;
+					sfb_codebook[g][sfb] = sect_codebook[g][i];
 				end
 				k+= sect_len;
 				i++;
@@ -114,14 +138,62 @@ class refmod_decodificadorAAC extends ovm_component;
 		
 	endtask
 	
-	task handle_scalefactor_data();
-		//ler as informações relatias a um ics_info()
+	task handle_scale_factor_data(scale_factor_data sfd);
+	//processa as informações relativas aos fatores de escala
+		int dpcmSF = 0;   
+		int lastSF = global_gain;
+		for(int g=0; g< num_window_groups; g++) begin
+			for(int sfb=0; sfb< max_sfb; sfb++) begin
+				if(sfb_codebook[g][sfb] != 0) begin //ZERO_HCB
+					if(sfb_codebook[g][sfb] == 14 || sfb_codebook[g][sfb] == 15) begin 
+					//INTENSITY_HCB OU INTENSITY_HCB2
+						tr_out_erro.erro = 5;
+					end
+					else begin
+					//decodifica os fatores de escala de tamanho variável e calcula o valor diferencial
+						huffmanDecoder = new(12); //12 indica para usar o livro de codigo dos fatores de escala
+						dpcmSF = huffmanDecoder.decode(sfd.hcod_sf[g][sfb]);				
+						sf[g][sfb] = lastSF + dpcmSF;
+						$display("SF[%d][%d] = %d", g, sfb, sf[g][sfb] );
+						lastSF = sf[g][sfb];
+					end					
+				end
+				else begin
+					sf[g][sfb] = 0;
+				end
+			end
+		end
 		
 	endtask
 	
-	task handle_spectral_data();
-		//ler as informações relatias a um ics_info()
-		
+	task handle_spectral_data(spectral_data spectral_data);
+		//processa as informações relativas aos coeficientes espectrais		
+		for(int g=0; g< num_window_groups; g++) begin
+			for(int i=0; i< num_sec[g]; i++) begin
+				if(sect_codebook[g][i] != 0 && sect_codebook[g][i] <= 11) begin //11= ESC_HCB
+					huffmanDecoder = new(sect_codebook[g][i]);
+					for(int k=0 ; k< 10;) begin //FIXME sect_sfb_offset
+						if(sect_codebook[g][i] <= 4) begin //livros de código para quadruplas de coeficientes
+							//TODO decodificar os coeficientes espectrais w,x,y,z
+							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
+								//$display("### QUAD SEM SINAL");
+							end
+							k += 4;
+						end
+						else begin //livros de código para pares de coeficientes
+							//TODO decodificar os coeficientes espectrais y,z
+							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
+								//  $display("### PAIR SEM SINAL");
+							end
+							k += 2;
+							if(sect_codebook[g][i] == 11) begin //ESC_HCB
+								//TODO
+							end
+						end
+					end
+				end
+			end			
+		end
 	endtask
 	
    task run();
@@ -167,16 +239,16 @@ class refmod_decodificadorAAC extends ovm_component;
 							begin
 								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO SCE!! : \n");
-								handle_ics(ics);
+								handle_ics(ics, 1'b0);
 								
 							end
 							
 						1 : //ID_CPE
 							begin
-								ics = raw.sce[n_elements_in_raw].ics;
+								cpe = raw.cpe[n_elements_in_raw];
 								$display("\n######VEIO CPE!! : \n");
-								handle_ics(ics);
-								handle_ics(ics);
+								handle_ics(cpe.ics1, cpe.common_window);
+								handle_ics(cpe.ics2, cpe.common_window);
 							end
 							
 						2 : //ID_CCE
@@ -220,11 +292,10 @@ class refmod_decodificadorAAC extends ovm_component;
 					break;
 				end
 			end //fim do for para os raw_data_block
-
 		end // fim do if do erro
-		else
+		else begin
 			erro_stim.put(tr_out_erro);
-        
+        end
       end //fim do while(1)
     endtask
 

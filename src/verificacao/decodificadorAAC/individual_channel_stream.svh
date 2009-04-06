@@ -9,7 +9,7 @@ class individual_channel_stream extends ovm_object;
 		 
 	rand byte global_gain; //8 bits
 	constraint global_gain_range {
-     global_gain dist { [0:255] };
+     global_gain dist { [0:20] :/ 8 };
     }
 	
 	//if (!common_window)
@@ -17,17 +17,21 @@ class individual_channel_stream extends ovm_object;
 	
 	rand section_data section_data = new;
 	rand scale_factor_data scale_factor_data = new;
+	
 	rand bit pulse_data_present; //1 bit
-	//if (pulse_data_present) 
-	//rand pulse_data pulse_data = new;
+	constraint pulse_data_present_range {
+     pulse_data_present dist { 1'b0:/ 8 };
+    }
 
 	rand bit tns_data_present; //1 bit
-	//if (tns_data_present) 
-	//rand tns_data tns_data = new;
+	constraint tns_data_present_range {
+     tns_data_present dist { 1'b0:/ 8 };
+    }
 	
 	rand bit gain_control_data_present; //1 bit
-	//if (gain_control_data_present) 
-	//rand gain_control_data gain_control_data = new;
+	constraint gain_control_data_present_range {
+     gain_control_data_present dist { 1'b0:/ 8 };
+    }
 	
 	rand spectral_data spectral_data = new;
 
