@@ -30,7 +30,7 @@ class AACHuffmanDecoder extends ovm_object;
 		   begin
 		   //TODO mais um case com as entradas do livro de código correspondente
 				case(codeword)
-					
+				
 					32'h0003ffe8 : decode = 0 + indexOffset;
 					32'h0003ffe6 : decode = 1 + indexOffset;
 					32'h0003ffe7 : decode = 2 + indexOffset;
@@ -1638,6 +1638,7 @@ class AACHuffmanDecoder extends ovm_object;
 
 		   end
 		endcase
+
 	endfunction
    
 endclass 

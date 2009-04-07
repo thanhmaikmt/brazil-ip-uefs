@@ -22,9 +22,12 @@ class sink extends ovm_component;
 			  case(tr_erro.erro)
 						1 : $display("######CHECKER -> ERRO: ADIF_ID INCORRETO!! ");
 						2 : $display("######CHECKER -> ERRO: BITSTREAM VARIAVEL!! ");
-						3: $display("######CHECKER -> ERRO: BITRATE INADEQUADO!!");
-						4: $display("######CHECKER -> ERRO: MAIS DE UMA CONFIGURACAO DE PROGRAMA!!");
-						default: $display("######CHECKER -> ERRO: INFORMAÇÃO INESPERADA NO STREAM!! ");
+						3:  $display("######CHECKER -> ERRO: BITRATE INADEQUADO!!");
+						4:  $display("######CHECKER -> ERRO: MAIS DE UMA CONFIGURACAO DE PROGRAMA!!");
+						5:  $display("######CHECKER -> ERRO: PERFIL AAC INADEQUADO!!");
+						6:  $display("######CHECKER -> ERRO: FREQUENCIA DE AMOSTRAGEM INADEQUADA!!");
+						15: $display("######CHECKER -> ERRO: INFORMAÇÃO INESPERADA NO STREAM!!");
+						default: $display("######CHECKER -> ERRO: ARQUIVO CORROMPIDO!! ");
 						
 			 endcase
 			 continue;

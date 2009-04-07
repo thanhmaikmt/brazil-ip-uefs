@@ -2,7 +2,7 @@
 `include "sdi.svh"
 `include "raw_data_block.svh"
 
-
+parameter N_RAW_DATA_BLOCK = 4;
 /***********************************/
    function void record_set_stream(int reco , int adif_id, bit copyright_id_present, int copyright_id, bit original_copy, bit home, bit bitstream_type, int bitrate, int num_program_config_elements, int adif_buffer_fullness);
       // optionaly use format specifier as 3rd argument of sdi_set_attribute 
@@ -44,10 +44,13 @@ class stream extends ovm_object;
    rand bit home; 
    
    rand bit bitstream_type; 
+   constraint bitstream_type_range {
+     bitstream_type dist { 0 :/ 8 }; //CONSTANTE = 0
+   }
    
    rand bit[22:0] bitrate; 
    constraint bitrate_range {
-     bitrate dist { [0:15] };
+     bitrate dist { [1:529200] :/ 9 };
    }
    
    rand bit[3:0] num_program_config_elements; 
@@ -69,7 +72,7 @@ class stream extends ovm_object;
 // ### INICIO RAW_DATA_STREAM
 // Suficiente para 10s de audio
 // 44.1k * 10s / 1024 amostras = 431
-	rand raw_data_block raw_data_block[1:0];
+	rand raw_data_block raw_data_block[N_RAW_DATA_BLOCK-1:0];
 
 // ### INICIO RAW_DATA_STREAM
 
@@ -77,7 +80,7 @@ class stream extends ovm_object;
 		for(int i=0; i<3;i++)begin
 			pce[i] = new;
 		end
-		for(int i=0; i<2;i++)begin
+		for(int i=0; i<N_RAW_DATA_BLOCK;i++)begin
 			raw_data_block[i] = new;
 		end
 	endfunction
@@ -158,7 +161,7 @@ endclass
 class erro extends ovm_object;
    int record;
     
-   int erro; 
+   int erro = 0; 
 
    /*
    function integer equal(erro tr);

@@ -23,7 +23,7 @@ class ics_info extends ovm_object;
 
 	function int get_num_window_groups();
 		int num_groups = 1;
-		for(int i =0; i <= 6; i++)begin
+		for(int i =6; i >= 0; i--)begin
 			if(scale_factor_grouping[i] == 1'b0)
 				num_groups++;
 		end
