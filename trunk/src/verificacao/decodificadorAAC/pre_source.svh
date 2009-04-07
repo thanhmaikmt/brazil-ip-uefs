@@ -1,3 +1,4 @@
+
 class pre_source extends ovm_component;
 
    ovm_put_port #(stream) entrada_to_refmod;
@@ -8,7 +9,6 @@ class pre_source extends ovm_component;
    endfunction
 
    raw_data_block raw;
-   int nRawDataBlock = 2;
    
    task run();
       stream tr_entrada;
@@ -22,7 +22,7 @@ class pre_source extends ovm_component;
          if(!tr_entrada.read(file))
             assert(tr_entrada.randomize());
 		
-		for(int i=0; i< nRawDataBlock ; i++) begin	
+		for(int i=0; i< N_RAW_DATA_BLOCK ; i++) begin	
 			raw = tr_entrada.raw_data_block[i];
 			raw.reorderSyntaticElements();
 		end

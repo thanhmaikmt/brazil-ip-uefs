@@ -1,5 +1,22 @@
 `include "AACHuffmanDecoder.svh"
 
+parameter ID_SCE = 0;
+parameter ID_CPE = 1;
+parameter ID_CCE = 2;
+parameter ID_LFE = 3;
+parameter ID_DSE = 4;
+parameter ID_PCE = 5;
+parameter ID_FIL = 6;
+parameter ID_END = 7;
+parameter ZERO_HCB = 0;
+parameter ESC_HCB = 11;
+parameter INTENSITY_HCB = 14;
+parameter INTENSITY_HCB2 = 15;
+parameter FIRST_PAIR_HCB = 4;    
+parameter ESC_FLAG = 16;
+parameter EIGHT_SHORT_SEQUENCE = 2;
+//parameter N_RAW_DATA_BLOCK = 4;
+
 class refmod_decodificadorAAC extends ovm_component;
 
    ovm_get_port #(stream) entrada_stim;
@@ -29,21 +46,21 @@ class refmod_decodificadorAAC extends ovm_component;
 	  
       crm = new;
    endfunction
-   
-	
-   //enum { ID_SCE, ID_CPE, ID_CCE, ID_LFE, ID_DSE, ID_PCE, ID_FIL, ID_END } id_syn_ele;
-   //parameter int EIGHT_SHORT_SEQUENCE = 2;
+
 	AACHuffmanDecoder huffmanDecoder;
 	int id_syn_ele, global_gain, num_window_groups, max_sfb;
 	bit[7:0] scale_factor_grouping;
 	bit[1:0] window_sequence;
 	bit[3:0] sect_codebook[7:0][48:0]; //sect_codebook[g][i] => livro de codigo usado na secao i de um grupo g
 	bit[3:0] sfb_codebook[7:0][48:0]; //sfb_codebook[g][sfb] => livro de codigo usado na banda sfb de um grupo g
+	int window_group_length[7:0]; //tamanho de cada grupo de janela
+	int sect_sfb_offset[7:0][48:0]; //offset dos coeficientes para cada banda de cada grupo
+	int swb_offset[48:0]; // offset de coeficientes em cada swb
 	int sf[7:0][48:0]; //sf[g][sfb] => fatores de escala da banda sfb de um grupo g
 	int coefsR[1023:0]; //coeficientes espectrais
 	int coefsL[1023:0]; //coeficientes espectrais
+	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
 	bit window_shape;
-	int n_raw_data_block = 2;
 	raw_data_block raw;
 	int n_elements_in_raw = 0;
 	individual_channel_stream ics;
@@ -52,23 +69,156 @@ class refmod_decodificadorAAC extends ovm_component;
 	int sect_end[7:0][48:0]; //sect_end[g][i] => indice da sfb que é o final da secao i de um grupo g
 	int num_sec[7:0]; //num_sec[g] => numero de secoes do grupo g
 	
-
 	task handle_ics_info(ics_info ics_info);
+		$display("###########ICS INFO ... ");
 		window_sequence = ics_info.window_sequence;
 		window_shape = ics_info.window_shape;
-		if(window_sequence == 2) begin //EIGHT_SHORT_SEQUENCE
+		if(window_sequence == EIGHT_SHORT_SEQUENCE) begin //EIGHT_SHORT_SEQUENCE
 			max_sfb = ics_info.max_sfb_short;
 			scale_factor_grouping = ics_info.scale_factor_grouping;
-			num_window_groups = ics_info.get_num_window_groups();
+			//num_window_groups = ics_info.get_num_window_groups();			
 		end
 		else begin
 			max_sfb = ics_info.max_sfb_long;
-			if(ics_info.predictor_data_present) begin//presença de predição
-				tr_out_erro.erro = 5;
+			if(ics_info.predictor_data_present) begin//presenca de predicao
+				tr_out_erro.erro = 15;
 			end
 		end
+		setHelpVariables();
 		
 	endtask
+	
+	task setHelpVariables( );
+		int num_windows, num_swb, sect_sfb, offset, width;
+		if (window_sequence == 2'b10) begin
+			//EIGHT_SHORT_SEQUENCE:
+			num_windows = 8;
+			num_window_groups = 1;
+			window_group_length[num_window_groups-1] = 1;
+			num_swb = 14;
+			for (int i = 0; i < num_swb + 1; i++)
+				swb_offset[i] = get_swb_offset_short_window(i);
+			/*preparação do número de grupos e do tamanho de cada grupo*/
+			for (int i = 0; i < num_windows-1; i++) begin
+				if(scale_factor_grouping[6-i] == 1'b0) begin
+					num_window_groups += 1;
+					window_group_length[num_window_groups-1] = 1;
+				end
+				else begin
+					window_group_length[num_window_groups-1] += 1;
+				end
+			end
+			/* preparação do sect_sfb_offset para janelas curtas */
+			for (int g = 0; g < num_window_groups; g++) begin
+				sect_sfb = 0;
+				offset = 0;
+				for (int i = 0; i < max_sfb; i++) begin
+					width = get_swb_offset_short_window(i+1) - get_swb_offset_short_window(i);
+					width *= window_group_length[g];
+					sect_sfb_offset[g][sect_sfb++] = offset;
+					offset += width;
+				end
+				sect_sfb_offset[g][sect_sfb] = offset; //FIXME banda 14 não existe!!
+			end
+		end	
+		else begin
+			//2'b00: //ONLY_LONG_SEQUENCE:
+			//2'b01: // LONG_START_SEQUENCE:
+			//2'b11: //LONG_STOP_SEQUENCE: 
+			num_windows = 1;
+			num_window_groups = 1;
+			window_group_length[num_window_groups-1] = 1;
+			num_swb = 49;
+			/* preparação do sect_sfb_offset para janelas longas */
+			/* also copy the last value! */
+			for (int i = 0; i < max_sfb + 1; i++) begin
+				sect_sfb_offset[0][i] = get_swb_offset_long_window(i);
+				swb_offset[i] = get_swb_offset_long_window(i);
+			end
+		end
+
+	endtask
+	
+	//retorna o valor do offset de uma banda de fator de escala de janela curta para a frequencia de 44.1
+	function int get_swb_offset_short_window(int swb);
+		int offset = 0;
+		case(swb) 
+			0: offset = 0;
+			1: offset = 4;
+			2: offset = 8;
+			3: offset = 12;
+			4: offset = 16;
+			5: offset = 20;
+			6: offset = 28;
+			7: offset = 36;
+			8: offset = 44;
+			9: offset = 56;
+			10: offset = 68;
+			11: offset = 80;
+			12: offset = 96;
+			13: offset = 112;
+		endcase
+		
+		return offset;
+	endfunction
+	
+	//retorna o valor do offset de uma banda de fator de escala de janela longa para a frequencia de 44.1
+	function int get_swb_offset_long_window(int swb);
+		int offset = 0;
+		case(swb) 
+			0: offset = 0;
+			1: offset = 4;
+			2: offset = 8;
+			3: offset = 12;
+			4: offset = 16;
+			5: offset = 20;
+			6: offset = 24;
+			7: offset = 28;
+			8: offset = 32;
+			9: offset = 36;
+			10: offset = 40;
+			11: offset = 48;
+			12: offset = 56;
+			13: offset = 64;
+			14: offset = 72;
+			15: offset = 80;
+			16: offset = 88;
+			17: offset = 96;
+			18: offset = 108;
+			19: offset = 120;
+			20: offset = 132;
+			21: offset = 144;
+			22: offset = 160;
+			23: offset = 176;
+			24: offset = 196;
+			25: offset = 216;
+			26: offset = 240;
+			27: offset = 264;
+			28: offset = 292;
+			29: offset = 320;
+			30: offset = 352;
+			31: offset = 384;
+			32: offset = 416;
+			33: offset = 448;
+			34: offset = 480;
+			35: offset = 512;
+			36: offset = 544;
+			37: offset = 576;
+			38: offset = 608;
+			39: offset = 640;
+			40: offset = 672;
+			41: offset = 704;
+			42: offset = 736;
+			43: offset = 768;
+			44: offset = 800;
+			45: offset = 832;
+			46: offset = 864;
+			47: offset = 896;
+			48: offset = 928;				
+		endcase
+		
+		return offset;
+	endfunction
 	
 	 task handle_ics(individual_channel_stream ics, bit common_window);
 		global_gain = ics.global_gain;
@@ -79,14 +229,15 @@ class refmod_decodificadorAAC extends ovm_component;
 		handle_scale_factor_data(ics.scale_factor_data);
 		
 		if(ics.pulse_data_present)
-			tr_out_erro.erro = 5;
+			tr_out_erro.erro = 15;
 		if(ics.tns_data_present)
-			tr_out_erro.erro = 5;
+			tr_out_erro.erro = 15;
 		if(ics.gain_control_data_present)
-			tr_out_erro.erro = 5;
+			tr_out_erro.erro = 15;
 			
 		handle_spectral_data(ics.spectral_data);
 		
+		nChannels++;
 		/*	
 		//TESTE - envia os coefs para o checker
 		for(int i=0; i< 64 ; i++) begin			
@@ -97,14 +248,14 @@ class refmod_decodificadorAAC extends ovm_component;
 			amostra_stim.put(tr_out_amostra);			
 		end
 		//FIM TESTE
-		*/
-		
+		*/		
 	endtask
 	
-	task handle_section_data(section_data sd);
+	task handle_section_data(section_data sd);		
 		//processa as informações relativas ao secionamento dos grupos
 		int k, i, sect_len, sect_len_incr, sect_esc_val, j;
-		if(window_sequence == 2) //EIGHT_SHORT_SEQUENCE
+		$display("#### SECTION_DATA ..");
+		if(window_sequence == EIGHT_SHORT_SEQUENCE) //EIGHT_SHORT_SEQUENCE
 			sect_esc_val = (1<<3) -1;
 		else
 			sect_esc_val = (1<<5) -1;
@@ -138,16 +289,16 @@ class refmod_decodificadorAAC extends ovm_component;
 		
 	endtask
 	
-	task handle_scale_factor_data(scale_factor_data sfd);
+	task handle_scale_factor_data(scale_factor_data sfd);	
 	//processa as informações relativas aos fatores de escala
 		int dpcmSF = 0;   
 		int lastSF = global_gain;
+		$display("##### SCALE_FACTOR_DATA ... " );
 		for(int g=0; g< num_window_groups; g++) begin
 			for(int sfb=0; sfb< max_sfb; sfb++) begin
 				if(sfb_codebook[g][sfb] != 0) begin //ZERO_HCB
-					if(sfb_codebook[g][sfb] == 14 || sfb_codebook[g][sfb] == 15) begin 
-					//INTENSITY_HCB OU INTENSITY_HCB2
-						tr_out_erro.erro = 5;
+					if(sfb_codebook[g][sfb] == INTENSITY_HCB || sfb_codebook[g][sfb] == INTENSITY_HCB2) begin 
+						tr_out_erro.erro = 15;
 					end
 					else begin
 					//decodifica os fatores de escala de tamanho variável e calcula o valor diferencial
@@ -166,34 +317,124 @@ class refmod_decodificadorAAC extends ovm_component;
 		
 	endtask
 	
-	task handle_spectral_data(spectral_data spectral_data);
+	task handle_spectral_data(spectral_data spectral_data);		
+		int coef_index = 0;
+		int dim, index, lav, mod, off = 0;
+		int w,x,y,z;
+		bit[20:0] hcod_esc_y, hcod_esc_z;
+		int coefs[1023:0];
+		$display("##### SPECTRAL_FACTOR_DATA ... " );
+	
 		//processa as informações relativas aos coeficientes espectrais		
 		for(int g=0; g< num_window_groups; g++) begin
+			//$display("## num_window_groups= %d | num_sec[0] = %d | " , num_window_groups,  num_sec[0] );
 			for(int i=0; i< num_sec[g]; i++) begin
-				if(sect_codebook[g][i] != 0 && sect_codebook[g][i] <= 11) begin //11= ESC_HCB
+			//	$display("## num_window_groups= %d | num_sec[%d] = %d | sect_sfb_offset[start]=  | sect_sfb_offset[end]= " , num_window_groups, g,  num_sec[g] );
+				if(sect_codebook[g][i] != ZERO_HCB && sect_codebook[g][i] <= ESC_HCB) begin //11= ESC_HCB
 					huffmanDecoder = new(sect_codebook[g][i]);
-					for(int k=0 ; k< 10;) begin //FIXME sect_sfb_offset
-						if(sect_codebook[g][i] <= 4) begin //livros de código para quadruplas de coeficientes
-							//TODO decodificar os coeficientes espectrais w,x,y,z
-							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
-								//$display("### QUAD SEM SINAL");
-							end
+					for(int k=sect_sfb_offset[g][sect_start[g][i]] ; k< sect_sfb_offset[g][sect_end[g][i]];) begin			
+						if(sect_codebook[g][i] <= FIRST_PAIR_HCB) begin 
+						/*livros de código para quadruplas de coeficientes*/
+							dim = 4;
+						end
+						else begin 
+						/*livros de código para pares de coeficientes*/
+							dim = 2;
+						end
+						/*configura o maior valor absoluto para cada livro de codigo*/
+						if(sect_codebook[g][i] <= 2) 
+							lav = 1;
+						else if (sect_codebook[g][i] <= 4)
+							lav = 2;
+						else if(sect_codebook[g][i] <= 6) 
+							lav = 4;
+						else if(sect_codebook[g][i] <= 8)
+							lav = 7;
+						else if(sect_codebook[g][i] <= 8)
+							lav = 12;
+						else
+							lav = 16;
+								
+						if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
+							mod = lav + 1;
+							off = 0;								
+						end
+						else begin
+							mod = 2*lav + 1;
+							off = lav;
+						end
+						index = huffmanDecoder.decode(spectral_data.hcod[coef_index]);
+						//$display("## INDEX = %d" , index);
+						if (dim == 4) begin
+							w = index/(mod*mod*mod) - off;
+							index -= (w+off)*(mod*mod*mod);
+							x = index/(mod*mod) - off;
+							index-= (x+off)*(mod*mod);
+							y = index/mod - off;
+							index -= (y+off)*mod;
+							z = index - off;
 							k += 4;
-						end
-						else begin //livros de código para pares de coeficientes
-							//TODO decodificar os coeficientes espectrais y,z
+
 							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
-								//  $display("### PAIR SEM SINAL");
-							end
-							k += 2;
-							if(sect_codebook[g][i] == 11) begin //ESC_HCB
-								//TODO
-							end
+								//$display("### QUAD SEM SINAL");	
+								if (w != 0 && spectral_data.quad_sign_bits[coef_index][3])
+									w = -w;
+								if (x != 0 && spectral_data.quad_sign_bits[coef_index][2])
+									x = -x;
+								if (y != 0 && spectral_data.quad_sign_bits[coef_index][1])
+									y = -y;
+								if (z != 0 && spectral_data.quad_sign_bits[coef_index][0])
+									z = -z;								
+							end	
+							coefs[coef_index++] = w;
+							coefs[coef_index++] = x;
+							coefs[coef_index++] = y;
+							coefs[coef_index++] = z;
 						end
+						else if(dim == 2) begin
+							y = index/mod - off;
+							index -= (y+off)*mod;
+							z = index - off;
+							k += 2;
+
+							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
+								//$display("### PAIR SEM SINAL");
+							if (y != 0 && spectral_data.pair_sign_bits[coef_index][1])
+									y = -y;
+								if (z != 0 && spectral_data.pair_sign_bits[coef_index][0])
+									z = -z;															
+							end	
+							if(sect_codebook[g][i] == ESC_HCB) begin //ESC_HCB
+								//FIXME codigo de escape 
+								if(y == ESC_FLAG) 
+									hcod_esc_y = spectral_data.hcod_esc_y[coef_index];
+								if(z == ESC_FLAG)
+									hcod_esc_z = spectral_data.hcod_esc_z[coef_index]; 
+							end							
+							coefs[coef_index++] = y;
+							coefs[coef_index++] = z;
+						end
+		
 					end
 				end
 			end			
 		end
+		if( nChannels%2 == 0)  begin			
+			//se for par estamos recebendo o canal esquerdo
+			$display("### Coeficientes canal esquerdo: ");
+			foreach(coefs[i]) begin
+				coefsL[i] = coefs[i];
+				$display("### Coef[%d] = %d " , i, coefs[i] );
+			end
+		end
+		else begin
+			//se for impar estamos recebendo o canal direito
+			$display("### Coeficientes canal direito: ");
+			foreach(coefs[i]) begin
+				coefsR[i] = coefs[i];
+				$display("### Coef[%d] = %d " , i, coefs[i] );
+			end
+		end	
 	endtask
 	
    task run();
@@ -201,6 +442,7 @@ class refmod_decodificadorAAC extends ovm_component;
         entrada_stim.get(tr_in_entrada);        
         tr_out_amostra= new();
 		tr_out_erro= new();
+		nChannels = 0;
         
         //-----------------------------------------------------------------------
         // Here goes the code that executes the reference model's functionality.
@@ -217,25 +459,32 @@ class refmod_decodificadorAAC extends ovm_component;
 			//$display("\n######ERRO: BITSTREAM VARIAVEL!! : \n");
 			tr_out_erro.erro = 2;
 		end
-		else if(tr_in_entrada.bitrate > 14) begin
+		else if(tr_in_entrada.bitrate == 0 || tr_in_entrada.bitrate > 529200) begin
 			//$display("\n######ERRO: BITRATE INADEQUADO!! : \n");
 			tr_out_erro.erro = 3;
 		end
-		else if(tr_in_entrada.num_program_config_elements != 4'd0) begin
+		else if(tr_in_entrada.num_program_config_elements != 0) begin
 			//$display("\n######ERRO: MAIS DE UMA CONFIGURACAO DE PROGRAMA!! : \n");
 			tr_out_erro.erro = 4;
 		end
+		else if(tr_in_entrada.pce[0].profile != 1) begin //LC
+			//$display("\n######ERRO: PERFIL DIFERENTE DE LC!! : \n");
+			tr_out_erro.erro = 5;
+		end	
+		else if(tr_in_entrada.pce[0].sampling_frequency_index != 4) begin //44100
+			//$display("\n######ERRO: FREQUENCIA DE AMOSTRAGEM DIFERENTE DE 44.1KhZ!! : \n");
+			tr_out_erro.erro = 6;
+		end		
 		if(tr_out_erro.erro == 0) begin
 			//IDENTIFICA OS RAW_DATA_BLOCK		
-			for(int i=0; i< n_raw_data_block ; i++) begin	
+			for(int i=0; i< N_RAW_DATA_BLOCK ; i++) begin	
 				$display("\n###### ..........RAW_DATA_BLOCK..........####### %d ", i);
 				raw = tr_in_entrada.raw_data_block[i];
-				//raw.reorderSyntaticElements();
 				id_syn_ele = raw.id_syn_ele[0];
 				n_elements_in_raw = 0;			
-				while(id_syn_ele != 7) begin //ID_END
+				while(id_syn_ele != ID_END) begin //ID_END
 					case(id_syn_ele)					
-						0 : //ID_SCE
+						ID_SCE : //ID_SCE
 							begin
 								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO SCE!! : \n");
@@ -243,39 +492,43 @@ class refmod_decodificadorAAC extends ovm_component;
 								
 							end
 							
-						1 : //ID_CPE
+						ID_CPE : //ID_CPE
 							begin
 								cpe = raw.cpe[n_elements_in_raw];
 								$display("\n######VEIO CPE!! : \n");
+								if (cpe.common_window)
+									handle_ics_info(cpe.ics_info);
+								if(cpe.ms_mask_present == 1)
+									tr_out_erro.erro = 15;
 								handle_ics(cpe.ics1, cpe.common_window);
 								handle_ics(cpe.ics2, cpe.common_window);
 							end
 							
-						2 : //ID_CCE
+						ID_CCE : //ID_CCE
 							begin
 								$display("\n######VEIO CCE!! : \n");
-								tr_out_erro.erro = 5;
+								tr_out_erro.erro = 15;
 							end
 							
-						3 : //ID_LFE
+						ID_LFE : //ID_LFE
 							begin
 								$display("\n######VEIO LFE!! : \n");
-								tr_out_erro.erro = 5;
+								tr_out_erro.erro = 15;
 							end
 							
-						4 : //ID_DSE
+						ID_DSE : //ID_DSE
 							begin
 								$display("\n######VEIO DSE!! : \n");
 								
 							end
 							
-						5 : //ID_PCE
+						ID_PCE : //ID_PCE
 							begin
 								$display("\n######VEIO PCE!! : \n");
-								tr_out_erro.erro = 5;
+								tr_out_erro.erro = 15;
 							end
 						
-						6 : //ID_FIL
+						ID_FIL: //ID_FIL
 							begin
 								$display("\n######VEIO FILL!! : \n");
 							end

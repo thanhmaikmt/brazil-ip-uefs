@@ -5,12 +5,12 @@ class program_config_element extends syntatic_element;
 		 
    rand bit[1:0] profile; //2 bits
    constraint profile_range {
-     profile dist { [0:3] };
+     profile dist { 1 :/ 9 }; //perfil LC = 1
    }
    
    rand bit[3:0] sampling_frequency_index; //4 bits
    constraint sampling_frequency_index_range {
-     sampling_frequency_index dist { [0:15] };
+     sampling_frequency_index dist { 4 :/ 9 }; //44100
    }
    
    rand bit[3:0] num_front_channel_elements; //4 bits

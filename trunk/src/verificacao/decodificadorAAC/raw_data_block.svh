@@ -9,7 +9,7 @@
 class raw_data_block extends ovm_object;
 	rand bit[2:0] id_syn_ele[123:0];
 
-	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 3, 1 :/ 1, [2:3] :/1 , [4:6] :/ 2, 7 :/ 3 };}
+	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 4, 1 :/ 3, [2:3] :/1 , [4:6] :/ 2, 7 :/ 3 };}
    //constraint id_syn_ele_range {
    //  id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
    //}
@@ -48,7 +48,7 @@ class raw_data_block extends ovm_object;
 		int nCPE = 0;
 		int sceIndex = 0;
 		for(int i=0; i<124;i++)begin
-			if(id_syn_ele[i] == 7 && (nSCE<2 || nCPE < 1)) begin
+			if(id_syn_ele[i] == 7 && (nSCE<2 && nCPE < 1)) begin
 				if(nSCE == 1) begin
 					id_syn_ele[i] = 0; //ID_SCE
 					nSCE++;
