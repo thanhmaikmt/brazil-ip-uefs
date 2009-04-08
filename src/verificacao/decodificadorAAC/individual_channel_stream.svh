@@ -9,7 +9,7 @@ class individual_channel_stream extends ovm_object;
 		 
 	rand byte global_gain; //8 bits
 	constraint global_gain_range {
-     global_gain dist { [0:20] :/ 8 };
+     global_gain  dist { [0:20] :/ 8, [21 : 50] :/ 1, [51:255] :/ 1 };
     }
 	
 	//if (!common_window)
@@ -32,9 +32,9 @@ class individual_channel_stream extends ovm_object;
 	constraint gain_control_data_present_range {
      gain_control_data_present dist { 1'b0:/ 8 };
     }
-	
-	rand spectral_data spectral_data = new;
 
+	rand spectral_data spectral_data = new;
+	
 	function string psprint();
       psprint = $psprintf(" ##ICS : global_gain = %d \n%s \n%s \n%s \n%s" , global_gain, ics_info.psprint(), scale_factor_data.psprint(), section_data.psprint(), spectral_data.psprint() );
    endfunction

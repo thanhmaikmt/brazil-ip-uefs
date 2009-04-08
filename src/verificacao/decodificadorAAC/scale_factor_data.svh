@@ -9,7 +9,7 @@ class scale_factor_data extends ovm_object;
 	constraint hcod_sf_range {
 		foreach (hcod_sf[i]) // For every element
 			foreach (hcod_sf[,j])
-					hcod_sf[i][j] dist { 0 :/ 50 , 4 :/ 40, [4'ha:4'hc] :/ 20,[8'h1a:8'h1b] :/ 15,[8'h38:8'hc] :/ 14, [8'h78:8'h7a] :/ 13, [8'hf6:8'hfa] :/ 12, [12'h1f6:12'h1f9] :/ 11, [12'h3f4:12'h3f9] :/ 10, [12'h7f4:12'h7f9] :/ 9, [12'hff4:12'hff9] :/ 9, [16'h1ff4:16'h1ff8] :/ 8, [16'h3ff2:16'h3ff9] :/ 7, [16'h7ff4:16'h7ff7] :/ 6, [16'hfff0:16'hfff6] :/ 5, [20'h1ffee:20'h1fff0] :/ 4, [20'h3ffe2:20'h3ffe8] :/ 3, [20'h7ffd2:20'h7ffd2] :/ 3 };
+					hcod_sf[i][j] dist { 0 :/ 60 , 4 :/ 45, [4'ha:4'hc] :/ 20,[8'h1a:8'h1b] :/ 15,[8'h38:8'h3b] :/ 14, [8'h78:8'h7a] :/ 13, [8'hf6:8'hfa] :/ 12, [12'h1f6:12'h1f9] :/ 11, [12'h3f4:12'h3f9] :/ 10, [12'h7f4:12'h7f9] :/ 9, [12'hff4:12'hff9] :/ 9, [16'h1ff4:16'h1ff8] :/ 8, [16'h3ff2:16'h3ff9] :/ 7, [16'h7ff4:16'h7ff7] :/ 6, [16'hfff0:16'hfff6] :/ 5, [20'h1ffee:20'h1fff0] :/ 4, [20'h3ffe2:20'h3ffe8] :/ 3, [20'h7ffd2:20'h7ffff] :/ 3 };
 		}
 	
 
