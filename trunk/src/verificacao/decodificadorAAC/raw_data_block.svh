@@ -9,10 +9,9 @@
 class raw_data_block extends ovm_object;
 	rand bit[2:0] id_syn_ele[123:0];
 
-	constraint id_syn_ele_range {foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 4, 1 :/ 3, [2:3] :/1 , [4:6] :/ 2, 7 :/ 3 };}
-   //constraint id_syn_ele_range {
-   //  id_syn_ele[123:0] dist { [0:1] :/2, [4:6] :/1, [2:3] :/1 , 7 :/ 6 };
-   //}
+	constraint id_syn_ele_range {
+		foreach (id_syn_ele[i]) id_syn_ele[i] dist { 0 :/ 4, 1 :/ 3, [2:3] :/1 , [4:6] :/ 2, 7 :/ 3 };
+	}
    
    /*
     ID_name encoding Abbreviation Syntactic Element
@@ -27,16 +26,16 @@ class raw_data_block extends ovm_object;
    */ 
 	rand single_channel_element sce[1:0];
 	rand channel_pair_element cpe[1:0];
-	//rand data_stream_element dse[1:0];
-	//rand fill_element fill[1:0];
+	rand data_stream_element dse[1:0];
+	rand fill_element fill[1:0];
 	rand program_config_element pce[1:0];
 
 	function new();
 		for(int i=0; i<2;i++)begin
 			sce[i] = new;
 			cpe[i] = new;
-			//dse[i] = new;
-			//fill[i] = new;
+			dse[i] = new;
+			fill[i] = new;
 			pce[i] = new;
 		end
 
@@ -94,7 +93,7 @@ class raw_data_block extends ovm_object;
 	endtask
 	
 	function string psprint();
-      psprint = $psprintf(" ## RAW_DATA_BLOCK :  %s", sce[0].psprint());
+      psprint = $psprintf(" ## RAW_DATA_BLOCK :  id_syn_ele[0] = %d", id_syn_ele[0]);
    endfunction
    
 endclass 

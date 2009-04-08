@@ -4,7 +4,12 @@
 class section_data extends ovm_object;
 	// podem existir até 8 grupos. Cada grupo pode possuir até 49 fatores de escala. Cada grupo é dividido em seções, sendo que o tamanho da seção é dado em quantidade de sfb
 	rand bit[3:0] sect_cb[7:0][48:0];
-	
+	constraint sect_cb_range {
+		foreach (sect_cb[i]) // For every element
+			foreach (sect_cb[,j])
+					sect_cb[i][j] inside { [1:11] };
+		}
+		
 	//ate 4 possiveis incrementos para o tamanho da secao
 	rand bit[4:0] sect_len_incr[7:0][48:0][3:0];
 

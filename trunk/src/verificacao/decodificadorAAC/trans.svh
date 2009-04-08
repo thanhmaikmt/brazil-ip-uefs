@@ -2,7 +2,7 @@
 `include "sdi.svh"
 `include "raw_data_block.svh"
 
-parameter N_RAW_DATA_BLOCK = 4;
+parameter N_RAW_DATA_BLOCK = 2;
 /***********************************/
    function void record_set_stream(int reco , int adif_id, bit copyright_id_present, int copyright_id, bit original_copy, bit home, bit bitstream_type, int bitrate, int num_program_config_elements, int adif_buffer_fullness);
       // optionaly use format specifier as 3rd argument of sdi_set_attribute 
