@@ -1,0 +1,34 @@
+struct reescalador_input{
+	trans
+	{
+		int coeficiente;
+		int scalefactor;
+		bool signal;
+	}
+	signals
+	{	
+		bool signal;
+		signed[23] coeficiente;
+		signed[8] scalefactor;
+		bool clock;  
+		bool reset;  
+		bool acionar;
+	}
+}
+struct reescalador_output{
+	trans
+	{
+		double coef_reescalado;
+	}
+	signals
+	{
+		signed[25] coef_reescalado;
+	}
+}
+module reescalador
+{
+	input reescalador_input in_reescalador;
+	output reescalador_output out_reescalador;
+}
+
+

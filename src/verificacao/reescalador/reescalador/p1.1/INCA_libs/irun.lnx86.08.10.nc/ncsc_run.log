@@ -1,0 +1,19 @@
+$CDSROOT = /usr/local/cds/ius81
+$TESTDIR = /home/eder/uefs/brazil-ip/testbenches/reescalador/reescalador/p1
+
+TOOL:	ncsc	08.10-s008
+ncsc cc parameters: 
+	$CDSROOT/tools/systemc/gcc/4.1/bin/gcc
+	-I$CDSROOT/tools/include
+	-I$CDSROOT/tools/inca/include-DNCSC
+	-c
+	-x c  -Wall 
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/reescalador/reescalador/p1'
+ncsc: compiling $TESTDIR/gain.c
+
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/reescalador/reescalador/p1'
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/reescalador/reescalador/p1'
+building library run.so
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/reescalador/reescalador/p1'
