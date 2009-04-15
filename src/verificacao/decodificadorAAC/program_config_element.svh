@@ -51,26 +51,26 @@ class program_config_element extends syntatic_element;
 	rand bit pseudo_surround_enable; // 1 bits
 
 	//for (i = 0; i < num_front_channel_elements; i++)
-	rand bit[14:0] front_element_is_cpe; //1 bit
-	rand bit[14:0][3:0] front_element_tag_select; //4 bits	
+	rand bit front_element_is_cpe[14:0]; //1 bit
+	rand bit[3:0] front_element_tag_select[14:0]; //4 bits	
 	
 	//for (i = 0; i < num_side_channel_elements; i++) {
-	rand bit[14:0] side_element_is_cpe; //1 bslbf
-	rand bit[14:0][3:0] side_element_tag_select; //4 uimsbf
+	rand bit side_element_is_cpe[14:0]; //1 bslbf
+	rand bit[3:0] side_element_tag_select[14:0]; //4 uimsbf
 	
 	//for (i = 0; i < num_back_channel_elements; i++) {
-	rand bit[14:0] back_element_is_cpe; //1 bslbf
-	rand bit[14:0][3:0] back_element_tag_select; //4 uimsbf
+	rand bit back_element_is_cpe[14:0]; //1 bslbf
+	rand bit[3:0] back_element_tag_select[14:0]; //4 uimsbf
 	
 	//for (i = 0; i < num_lfe_channel_elements; i++)
-	rand bit[2:0][3:0] lfe_element_tag_select; //4 uimsbf
+	rand bit[3:0] lfe_element_tag_select[2:0]; //4 uimsbf
 	
 	//for (i = 0; i < num_assoc_data_elements; i++)
-	rand bit[6:0][3:0] assoc_data_element_tag_select; //4 uimsbf
+	rand bit[3:0] assoc_data_element_tag_select[6:0]; //4 uimsbf
 	
 	//for (i = 0; i < num_valid_cc_elements; i++) {
-	rand bit[14:0] cc_element_is_ind_sw; //1 uimsbf
-	rand bit[14:0][3:0] valid_cc_element_tag_select; //4 uimsbf
+	rand bit cc_element_is_ind_sw[14:0]; //1 uimsbf
+	rand bit[3:0] valid_cc_element_tag_select[14:0]; //4 uimsbf
 	
 	
 	//byte_alignment();

@@ -7,7 +7,6 @@ class ics_info extends ovm_object;
 	rand bit[1:0] window_sequence; //2 bits
 	rand bit window_shape; // 1 bit
 		
-	
 
 	rand bit[3:0] max_sfb_short; //4 bits
 	rand bit[6:0] scale_factor_grouping; //7 bits
@@ -17,9 +16,9 @@ class ics_info extends ovm_object;
 
 	rand bit predictor_reset; //1 bits
 
-	rand bit[4:0] predictor_reset_group_number; //5 bits
+	rand bit predictor_reset_group_number[4:0]; //5 bits
 
-	rand bit[48:0] prediction_used; //1 bits
+	rand bit prediction_used[48:0]; //1 bits
 
 	function int get_num_window_groups();
 		int num_groups = 1;
