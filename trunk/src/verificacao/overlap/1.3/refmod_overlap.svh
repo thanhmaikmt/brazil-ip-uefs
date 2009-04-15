@@ -1,5 +1,11 @@
 
+
+`include "overlap_aac.sv"
+
 class refmod_overlap extends ovm_component;
+
+  	//modelo de overlap_aac
+	 overlap_aac tr_overlap_aac;
 
    ovm_get_port #(overlap_input) in_overlap_stim;
    overlap_input tr_in_in_overlap;
@@ -28,20 +34,14 @@ class refmod_overlap extends ovm_component;
    task run();
 		while(1) begin
 			
-			int coef_pcm_in[4 : 0];
-			int coef_pcm_out[4 : 0];
+			int pcm_in[3 : 0];
+			int pcm_out[3 : 0];
 			int firstSequence;
 
-			
-			//-----------------------------------------------------------------------
-			// Here goes the code that executes the reference model's functionality.
-			//-----------------------------------------------------------------------
-
-			
 			for(int i = 0; i < 4; i++)
 				begin
 					in_overlap_stim.get(tr_in_in_overlap);
-					coef_pcm_in[i] = tr_in_in_overlap.pcmSample;
+					pcm_in[i] = tr_in_in_overlap.pcmSample;
 				end
 			
 			//in_overlap_stim.get(tr_in_in_overlap);
@@ -50,33 +50,22 @@ class refmod_overlap extends ovm_component;
 			$display("\n");
 			$display(">refmod_overlap");
 			$display("firstSequence: %d", tr_in_in_overlap.firstSequence);
-			$display("data in: %d, %d, %d, %d ", coef_pcm_in[0], coef_pcm_in[1], coef_pcm_in[2], coef_pcm_in[3]);
+			$display("data in: %d, %d, %d, %d ", pcm_in[0], pcm_in[1], pcm_in[2], pcm_in[3]);
 			
 			
-			if(tr_in_in_overlap.firstSequence == 1)
-				begin
-					coef_pcm_out[0] = coef_pcm_in[0];
-					coef_pcm_out[1] = coef_pcm_in[1];
-					coef_pcm_out[2] = coef_pcm_in[2];
-					coef_pcm_out[3] = coef_pcm_in[3];
-				end
-			else
-				begin
-					coef_pcm_out[0] = coef_pcm_in[0] + coef_pcm_in[2];
-					coef_pcm_out[1] = coef_pcm_in[1] + coef_pcm_in[3];
-					coef_pcm_out[2] = 0;
-					coef_pcm_out[3] = 0; 
-				end		
+			//chama a overlap_aac
+			tr_overlap_aac = new();
+			tr_overlap_aac.overlap(1, pcm_in, pcm_out);		
 			
 			
 			
-			$display("data out: %d, %d, %d, %d ", coef_pcm_out[0], coef_pcm_out[1], coef_pcm_out[2], coef_pcm_out[3]);
+			$display("data out: %d, %d, %d, %d ", pcm_out[0], pcm_out[1], pcm_out[2], pcm_out[3]);
 			
 			/////
 			for(int i = 0; i < 4; i++)
 				begin
 					tr_out_out_overlap = new();
-					tr_out_out_overlap.pcmSample = coef_pcm_out[i];
+					tr_out_out_overlap.pcmSample = pcm_out[i];
 					crm.sample();
 					out_overlap_stim.put(tr_out_out_overlap);
 				end
