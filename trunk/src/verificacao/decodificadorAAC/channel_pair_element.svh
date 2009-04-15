@@ -10,7 +10,7 @@ class channel_pair_element extends syntatic_element;
 	
 	//maximo de 8 grupos. Cada grupo pode ter o maximo de 49 bandas de fator de escala
 	//ms_used[g][sfb]
-	rand bit[7:0][48:0] ms_used;
+	rand bit ms_used[7:0][48:0];
 	
 	rand individual_channel_stream ics1 = new;
 	rand individual_channel_stream ics2 = new;
