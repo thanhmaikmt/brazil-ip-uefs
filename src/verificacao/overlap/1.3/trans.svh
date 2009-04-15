@@ -1,4 +1,9 @@
-`include "ovm.svh"
+`ifdef INCA
+  `include "ovm.svh"
+`else
+  import ovm_pkg::*;
+`endif
+
 `include "sdi.svh"
  
    function void record_set_overlap_input(int reco , int pcmSample, bit firstSequence);
