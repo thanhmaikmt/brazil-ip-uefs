@@ -489,7 +489,7 @@ class refmod_decodificadorAAC extends ovm_component;
 								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO SCE!! : \n");
 								handle_ics(ics, 1'b0);
-								
+								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
 						ID_CPE : //ID_CPE
@@ -502,6 +502,8 @@ class refmod_decodificadorAAC extends ovm_component;
 									tr_out_erro.erro = 15;
 								handle_ics(cpe.ics1, cpe.common_window);
 								handle_ics(cpe.ics2, cpe.common_window);
+								
+								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
 						ID_CCE : //ID_CCE
@@ -552,5 +554,39 @@ class refmod_decodificadorAAC extends ovm_component;
       end //fim do while(1)
     endtask
 
+	task apply_quantization();
+		int width = 0;
+		$display("########### DEQUANTIZACAO ... ");
+		for(int g; g < num_window_groups ; g++)begin
+			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
+				width = (swb_offset[sfb+1] - swb_offset[sfb]);
+				for(int win = 0; win < window_group_length[g] ; win++)begin
+					for(int bin = 0; bin < width; bin++)begin
+							/*x_invquant[g][win][sfb][bin] = sign(x_quant[g][win][sfb][bin]) *
+abs(x_quant[g][win][sfb][bin]) ^(4/3);*/			
+					end
+				end
+			end
+		end
+		
+	endtask
+	
+	task apply_reescaler(ics_info ics_info);
+		int width = 0;
+		$display("########### REESCALAMENTO ... ");
+		for(int g; g < num_window_groups ; g++)begin
+			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
+				width = (swb_offset[sfb+1] - swb_offset[sfb]);
+				for(int win = 0; win < window_group_length[g] ; win++)begin
+					for(int k = 0; k < width; k++)begin
+							/*x_rescal[g][window][sfb][k] =
+x_invquant[g][window][sfb][k] * gain;*/			
+					end
+				end
+			end
+		end
+		
+	endtask
+	
 endclass
 
