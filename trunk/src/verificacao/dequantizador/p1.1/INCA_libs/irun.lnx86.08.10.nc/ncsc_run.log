@@ -1,0 +1,18 @@
+$CDSROOT = /usr/local/cds/ius81
+$TESTDIR = /home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1
+
+TOOL:	ncsc	08.10-s008
+ncsc cc parameters: 
+	$CDSROOT/tools/systemc/gcc/4.1/bin/gcc
+	-I$CDSROOT/tools/include
+	-I$CDSROOT/tools/inca/include-DNCSC
+	-c
+	-x c  -Wall 
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+make[1]: `INCA_libs/irun.lnx86.08.10.nc/ncsc_run/ncsc_obj/dequantizador.o' está atualizado.
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+make[1]: `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1/./INCA_libs/irun.lnx86.08.10.nc/librun.so' está atualizado.
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'

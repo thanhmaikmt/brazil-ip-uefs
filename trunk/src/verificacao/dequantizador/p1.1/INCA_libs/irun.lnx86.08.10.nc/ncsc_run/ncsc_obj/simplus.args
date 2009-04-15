@@ -1,0 +1,3 @@
++tb_rc_dir+./INCA_libs/irun.lnx86.08.10.nc/ncsc_run
++tb_run_dir+/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1
++tb_trans_record

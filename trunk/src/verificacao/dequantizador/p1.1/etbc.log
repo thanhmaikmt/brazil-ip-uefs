@@ -1,0 +1,89 @@
+******** eTBc ***********
+eTBc LOG FILE
+Date:Jan 27 2009
+Time:19:25:15
+*************************
+
+FILE BEGIN
+
+FILE ARGUMENTS BEGIN
+
+FILE ARGUMENTS END
+
+CURRENT FILE NAME:tb.tcl
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:set idmp 0
+proc covering {} {
+  upvar 1 idmp idmp 
+  rm -rf ./cov_work/design/
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$idmp
+  set idmp [expr {
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$idmp+1}]
+  coverage -dump 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$idmp
+  set fileId [open "cov.cmd" w]
+  puts 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$fileId "load_test 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$idmp\nreport_summary -cgopt tb\nquit\n\n"
+  close 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$fileId
+  exec iccr cov.cmd | grep DC > DC_log.txt 
+  set fileId [open "DC_log.txt" r]
+  set log [read 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$fileId]
+  close 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$fileId
+  if {[regexp "DC:  100%" 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$log] == 1} {
+    puts "================================= Coverage completed ================================="
+    quit
+  } else {
+    puts "Coverage 
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:$log"
+  }
+}
+stop -create -condition {#tb.cov == 1'b1} -execute covering -continue
+run
+quit
+
+
+END FILE BEGIN
+
+END FILE END
+
+WRITE TEXT BEGIN
+
+WRITE TEXT END:
+

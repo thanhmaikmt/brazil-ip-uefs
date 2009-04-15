@@ -1,0 +1,31 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-RUNMODE
+-q
+-stop
+link
+-NOSYSTEMCLINK
+-novic
+-noscv
+-noedg
+-asext
+.s
+-ccext
+.c
+-objext
+.o
+-cxxext
+.cpp
+-cxxext
+.cc
+-ncscrc
+./INCA_libs/irun.lnx86.08.10.nc/ncsc_run
+-log
+./INCA_libs/irun.lnx86.08.10.nc/ncsc_run.log
+dequantizador.c
+-test
+./INCA_libs/irun.lnx86.08.10.nc/run
+-I/usr/local/cds/ius81/tools/include
+-I/usr/local/cds/ius81/tools/inca/include

@@ -1,0 +1,5 @@
+-DNCSC
+-I/usr/local/cds/ius81/tools/inca/include
+-I/usr/local/cds/ius81/tools/include
+-c
+-x c  -Wall 
