@@ -1,0 +1,27 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-NOWARN
+PMBDVX
+-NOWARN
+BIGWIX
+-loadpli
+/usr/local/cds/ius81/tools/ovm/lib/liburmpli.so:urm_pli_boot
+-ACCESS
++r
+-COVERAGE
+functional
+-MESSAGES
+-loadrun
+/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1/INCA_libs/irun.lnx86.08.10.nc/librun
+-XLMODE
+./INCA_libs/irun.lnx86.08.10.nc
+-RUNMODE
+-CDSLIB
+./INCA_libs/irun.lnx86.08.10.nc/cds.lib
+-HDLVAR
+./INCA_libs/irun.lnx86.08.10.nc/hdl.var
+-work
+worklib
+-HASXLMODE

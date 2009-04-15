@@ -1,0 +1,43 @@
+              Log File for ICCR 
+              TOOL:	iccr	08.10-s008
+
+############################################################################
+iccr> load_test 5
+Exploring 1 test directory.
+Loading test ./cov_work/design/5
+1 coverage database loaded
+
+############################################################################
+iccr> report_summary -cgopt tb
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+<> COVERAGE FILE: /home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1/cov_work/design/5/icc.data <>
+<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+
+        Coverage Summary Report, Module-Based
+        =====================================
+
+B = Block, BR = Branch, E = Expression
+TF = Toggle full transition, T^ = Toggle rise transition
+Tv = Toggle fall transition
+S = FSM state, TR = FSM transition
+F = Control-oriented, D = Data-oriented
+C = Cumulative coverage for that coverage type including sub hierarchy
+
+tb
+--
+B:   --% (-/-)           BC:   --% (-/-)         
+E:   --% (-/-)           EC:   --% (-/-)         
+TF:  --% (-/-)           TFC:  --% (-/-)         
+T^:  --% (-/-)           T^C:  --% (-/-)         
+Tv:  --% (-/-)           TvC:  --% (-/-)         
+S:   --% (-/-)           SC:   --% (-/-)         
+TR:  --% (-/-)           TRC:  --% (-/-)         
+F:   --% (0/0)           FC:   --% (0/0)         
+D:  100% (100/100)       DC:  100% (100/100)     
+
+
+############################################################################
+iccr> quit
+
+Exiting, current time/date:  Wed Apr 15 18:05:27 2009
+

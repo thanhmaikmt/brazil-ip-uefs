@@ -1,0 +1,35 @@
+struct dequantizador_input {
+	trans
+	{
+		int coef_quant;//coeficiente quantizado - input
+		bool signal;
+	}
+	signals
+	{
+		signed[12] x_quant;  // range 0 to 8191
+		bool signal;
+		bool clock;
+		bool reset;
+	}
+}
+
+struct dequantizador_output {
+	trans
+	{
+		int coef_dequant;//coeficiente dequantizado - output
+	}
+	signals
+	{
+		signed[23] x_inv_quant;  
+		bool signal;
+	}
+}
+
+
+
+module dequantizador
+{
+	input dequantizador_input in_dequant;
+	output dequantizador_output out_dequant;
+}
+

@@ -1,0 +1,1043 @@
+irun: 08.10-s008: (c) Copyright 1995-2008 Cadence Design Systems, Inc.
+TOOL:	irun	08.10-s008: Started on Apr 15, 2009 at 18:03:28 BRT
+irun
+	-ovmhome /usr/local/cds/ovm-2.0
+	-input tb.tcl
+	-access +r
+	-coverage functional
+	tb.sv
+	dequantizador.c
+irun: *N,OVMW: The use of the -ovm option will automatically suppress the following warnings 
+	PMBDVX
+	BIGWIX
+.
+$CDSROOT = /usr/local/cds/ius81
+$TESTDIR = /home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1
+
+TOOL:	ncsc	08.10-s008
+ncsc cc parameters: 
+	$CDSROOT/tools/systemc/gcc/4.1/bin/gcc
+	-I$CDSROOT/tools/include
+	-I$CDSROOT/tools/inca/include-DNCSC
+	-c
+	-x c  -Wall 
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+make[1]: `INCA_libs/irun.lnx86.08.10.nc/ncsc_run/ncsc_obj/dequantizador.o' está atualizado.
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+
+make[1]: Entrando no diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+make[1]: `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1/./INCA_libs/irun.lnx86.08.10.nc/librun.so' está atualizado.
+make[1]: Saindo do diretório `/home/eder/uefs/brazil-ip/testbenches/dequantizador/p1.1'
+
+Loading snapshot worklib.tb:sv .................... Done
+ncsim> source /usr/local/cds/ius81/tools/inca/files/ncsimrc
+ncsim> source /usr/local/cds/ius81/tools/ovm/files/tcl/urm_sim.tcl
+ncsim> set idmp 0
+0
+ncsim> proc covering {} {
+>   upvar 1 idmp idmp 
+>   rm -rf ./cov_work/design/$idmp
+>   set idmp [expr {$idmp+1}]
+>   coverage -dump $idmp
+>   set fileId [open "cov.cmd" w]
+>   puts $fileId "load_test $idmp\nreport_summary -cgopt tb\nquit\n\n"
+>   close $fileId
+>   exec iccr cov.cmd | grep DC > DC_log.txt 
+>   set fileId [open "DC_log.txt" r]
+>   set log [read $fileId]
+>   close $fileId
+>   if {[regexp "DC:  100%" $log] == 1} {
+>     puts "================================= Coverage completed ================================="
+>     quit
+>   } else {
+>     puts "Coverage $log"
+>   }
+> }
+ncsim> stop -create -condition {#tb.cov == 1'b1} -execute covering -continue
+Created stop 1
+ncsim> run
+SVSEED default: 1
+----------------------------------------------------------------
+OVM-2.0.1
+(C) 2007-2008 Mentor Graphics Corporation
+(C) 2007-2008 Cadence Design Systems, Inc.
+----------------------------------------------------------------
+SDI/Verilog Transaction Recording Facility Version 08.10-s007
+OVM_INFO @ 0: reporter [RNTST] Running test ...
+Open failed on file "tr.sti". No such file or directory
+Entrada:       4518,  Saida74690.000000
+Entrada:       6462,  Saida120362.000000
+Entrada:       3704,  Saida57310.000000
+Entrada:       1439,  Saida16246.000000
+Entrada:        342,  Saida2392.000000
+Entrada:        572,  Saida4748.000000
+Entrada:        615,  Saida5230.000000
+Entrada:       4845,  Saida81983.000000
+Entrada:       2149,  Saida27732.000000
+Entrada:          4,  Saida6.000000
+Entrada:       7306,  Saida141766.000000
+Entrada:       1400,  Saida15662.000000
+Entrada:       3615,  Saida55481.000000
+Entrada:       2402,  Saida32168.000000
+Entrada:       2209,  Saida28769.000000
+Entrada:       6577,  Saida123226.000000
+Entrada:       5849,  Saida105384.000000
+Entrada:        755,  Saida6875.000000
+Entrada:       7757,  Saida153553.000000
+Entrada:       3954,  Saida62524.000000
+Entrada:       4132,  Saida66305.000000
+Entrada:        624,  Saida5332.000000
+Entrada:       2986,  Saida42998.000000
+Entrada:        271,  Saida1754.000000
+Entrada:       3446,  Saida52050.000000
+Entrada:       5590,  Saida99209.000000
+Entrada:       5213,  Saida90389.000000
+Entrada:       6973,  Saida133217.000000
+Entrada:       5342,  Saida93384.000000
+Entrada:       5962,  Saida108108.000000
+Entrada:       1892,  Saida23401.000000
+Entrada:       2696,  Saida37523.000000
+Entrada:        665,  Saida5804.000000
+Entrada:       7246,  Saida140216.000000
+Entrada:       4714,  Saida79041.000000
+Entrada:       2578,  Saida35349.000000
+Entrada:       4045,  Saida64450.000000
+Entrada:       4646,  Saida77524.000000
+Entrada:       4201,  Saida67786.000000
+Entrada:       1175,  Saida12399.000000
+Entrada:        277,  Saida1806.000000
+Entrada:       1769,  Saida21395.000000
+Entrada:       2804,  Saida39540.000000
+Entrada:       5248,  Saida91199.000000
+Entrada:       5847,  Saida105336.000000
+Entrada:       1092,  Saida11245.000000
+Entrada:       1571,  Saida18263.000000
+Entrada:       2375,  Saida31687.000000
+Entrada:       4736,  Saida79533.000000
+Entrada:       7886,  Saida156967.000000
+Entrada:       7354,  Saida143009.000000
+Entrada:       8014,  Saida160373.000000
+Entrada:       5576,  Saida98877.000000
+Entrada:       5006,  Saida85636.000000
+Entrada:       8097,  Saida162592.000000
+Entrada:       3698,  Saida57186.000000
+Entrada:       3475,  Saida52635.000000
+Entrada:       4337,  Saida70727.000000
+Entrada:       5070,  Saida87098.000000
+Entrada:       2631,  Saida36321.000000
+Entrada:       1308,  Saida14305.000000
+Entrada:       4475,  Saida73744.000000
+Entrada:       7414,  Saida144567.000000
+Entrada:       6771,  Saida128096.000000
+Entrada:       4426,  Saida72669.000000
+Entrada:       5856,  Saida105552.000000
+Entrada:       7298,  Saida141559.000000
+Entrada:        246,  Saida1541.000000
+Entrada:       7445,  Saida145374.000000
+Entrada:       3116,  Saida45512.000000
+Entrada:       6926,  Saida132021.000000
+Entrada:       3406,  Saida51246.000000
+Entrada:       5202,  Saida90135.000000
+Entrada:       1110,  Saida11493.000000
+Entrada:       6599,  Saida123776.000000
+Entrada:       2412,  Saida32347.000000
+Entrada:       3497,  Saida53080.000000
+Entrada:       5180,  Saida89627.000000
+Entrada:       5336,  Saida93244.000000
+Entrada:       8036,  Saida160961.000000
+Entrada:       1397,  Saida15617.000000
+Entrada:         28,  Saida85.000000
+Entrada:       2003,  Saida25249.000000
+Entrada:       1075,  Saida11012.000000
+Entrada:       4377,  Saida71598.000000
+Entrada:       3341,  Saida49946.000000
+Entrada:       3517,  Saida53485.000000
+Entrada:       3659,  Saida56383.000000
+Entrada:       6087,  Saida111140.000000
+Entrada:       2819,  Saida39822.000000
+Entrada:       1099,  Saida11341.000000
+Entrada:        263,  Saida1685.000000
+Entrada:       8065,  Saida161736.000000
+Entrada:       1985,  Saida24947.000000
+Entrada:       3568,  Saida54521.000000
+Entrada:       4959,  Saida84565.000000
+Entrada:       4313,  Saida70206.000000
+Entrada:       2326,  Saida30819.000000
+Entrada:       5996,  Saida108930.000000
+Entrada:       7209,  Saida139262.000000
+100 NS + 0 (stop 1: tb.cov = 1)
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  1
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model
+  data               :  ./cov_work/design/1/icc.data
+Coverage D:    0% (0/100)         DC:    0% (0/100)       
+
+Entrada:        731,  Saida6585.000000
+Entrada:       2347,  Saida31190.000000
+Entrada:        316,  Saida2152.000000
+Entrada:       7626,  Saida150105.000000
+Entrada:       3709,  Saida57413.000000
+Entrada:       3170,  Saida46567.000000
+Entrada:       2055,  Saida26127.000000
+Entrada:       3196,  Saida47077.000000
+Entrada:       6985,  Saida133523.000000
+Entrada:       7753,  Saida153447.000000
+Entrada:       5867,  Saida105817.000000
+Entrada:       1832,  Saida22416.000000
+Entrada:       2421,  Saida32508.000000
+Entrada:        339,  Saida2364.000000
+Entrada:       1493,  Saida17064.000000
+Entrada:       6915,  Saida131742.000000
+Entrada:       6015,  Saida109391.000000
+Entrada:       2245,  Saida29396.000000
+Entrada:       4497,  Saida74227.000000
+Entrada:       4055,  Saida64663.000000
+Entrada:        755,  Saida6875.000000
+Entrada:       4194,  Saida67635.000000
+Entrada:       5480,  Saida96614.000000
+Entrada:       6096,  Saida111359.000000
+Entrada:       4005,  Saida63602.000000
+Entrada:       7285,  Saida141223.000000
+Entrada:       8077,  Saida162057.000000
+Entrada:        652,  Saida5654.000000
+Entrada:       7594,  Saida149266.000000
+Entrada:        295,  Saida1964.000000
+Entrada:       3928,  Saida61977.000000
+Entrada:       1106,  Saida11438.000000
+Entrada:       1069,  Saida10930.000000
+Entrada:       4478,  Saida73809.000000
+Entrada:       3778,  Saida58841.000000
+Entrada:       4586,  Saida76192.000000
+Entrada:       6088,  Saida111165.000000
+Entrada:       7675,  Saida151393.000000
+Entrada:       1320,  Saida14480.000000
+Entrada:       4678,  Saida78237.000000
+Entrada:       2910,  Saida41545.000000
+Entrada:       6911,  Saida131640.000000
+Entrada:       4883,  Saida82842.000000
+Entrada:        584,  Saida4881.000000
+Entrada:       5000,  Saida85499.000000
+Entrada:       2396,  Saida32061.000000
+Entrada:       4282,  Saida69534.000000
+Entrada:        823,  Saida7713.000000
+Entrada:       6188,  Saida113606.000000
+Entrada:         60,  Saida235.000000
+Entrada:       7502,  Saida146860.000000
+Entrada:        969,  Saida9589.000000
+Entrada:       6078,  Saida110921.000000
+Entrada:       1766,  Saida21346.000000
+Entrada:       5399,  Saida94715.000000
+Entrada:       1503,  Saida17217.000000
+Entrada:       5438,  Saida95628.000000
+Entrada:       3760,  Saida58468.000000
+Entrada:       8047,  Saida161255.000000
+Entrada:        768,  Saida7033.000000
+Entrada:       4661,  Saida77858.000000
+Entrada:       7719,  Saida152551.000000
+Entrada:       1476,  Saida16805.000000
+Entrada:       1246,  Saida13408.000000
+Entrada:       3580,  Saida54766.000000
+Entrada:       2328,  Saida30854.000000
+Entrada:       7407,  Saida144385.000000
+Entrada:       1819,  Saida22205.000000
+Entrada:        987,  Saida9827.000000
+Entrada:       1153,  Saida12090.000000
+Entrada:       5174,  Saida89489.000000
+Entrada:       3236,  Saida47864.000000
+Entrada:       5284,  Saida92034.000000
+Entrada:       4889,  Saida82977.000000
+Entrada:       6254,  Saida115224.000000
+Entrada:       2499,  Saida33912.000000
+Entrada:       2347,  Saida31190.000000
+Entrada:       1607,  Saida18823.000000
+Entrada:       3160,  Saida46371.000000
+Entrada:       2107,  Saida27012.000000
+Entrada:       2570,  Saida35203.000000
+Entrada:        568,  Saida4704.000000
+Entrada:       4989,  Saida85248.000000
+Entrada:       3863,  Saida60613.000000
+Entrada:       4742,  Saida79668.000000
+Entrada:        798,  Saida7402.000000
+Entrada:       3400,  Saida51126.000000
+Entrada:       4879,  Saida82751.000000
+Entrada:       2620,  Saida36119.000000
+Entrada:       7868,  Saida156490.000000
+Entrada:        696,  Saida6168.000000
+Entrada:       5177,  Saida89558.000000
+Entrada:       5772,  Saida103538.000000
+Entrada:       7780,  Saida154160.000000
+Entrada:       7775,  Saida154028.000000
+Entrada:        692,  Saida6121.000000
+Entrada:       3763,  Saida58530.000000
+Entrada:       5378,  Saida94224.000000
+Entrada:       5830,  Saida104928.000000
+Entrada:       7719,  Saida152551.000000
+Entrada:        832,  Saida7825.000000
+Entrada:       7146,  Saida137642.000000
+Entrada:       6978,  Saida133344.000000
+Entrada:       8125,  Saida163342.000000
+Entrada:       7674,  Saida151366.000000
+Entrada:        696,  Saida6168.000000
+Entrada:        158,  Saida854.000000
+Entrada:       3252,  Saida48180.000000
+Entrada:       6239,  Saida114856.000000
+Entrada:        711,  Saida6346.000000
+Entrada:        185,  Saida1054.000000
+Entrada:       8109,  Saida162913.000000
+Entrada:       4178,  Saida67291.000000
+Entrada:       6214,  Saida114243.000000
+Entrada:       4678,  Saida78237.000000
+Entrada:       6017,  Saida109439.000000
+Entrada:       7583,  Saida148978.000000
+Entrada:       3912,  Saida61640.000000
+Entrada:       7676,  Saida151419.000000
+Entrada:       3117,  Saida45532.000000
+Entrada:       5414,  Saida95066.000000
+Entrada:       4295,  Saida69815.000000
+Entrada:        726,  Saida6525.000000
+Entrada:        432,  Saida3266.000000
+Entrada:        350,  Saida2467.000000
+Entrada:       5065,  Saida86984.000000
+Entrada:       1207,  Saida12851.000000
+Entrada:       6029,  Saida109730.000000
+Entrada:       4609,  Saida76702.000000
+Entrada:       1415,  Saida15886.000000
+Entrada:       6408,  Saida119023.000000
+Entrada:       4263,  Saida69123.000000
+Entrada:       5962,  Saida108108.000000
+Entrada:       5927,  Saida107262.000000
+Entrada:       1439,  Saida16246.000000
+Entrada:       6543,  Saida122378.000000
+Entrada:        731,  Saida6585.000000
+Entrada:       7846,  Saida155907.000000
+Entrada:       6686,  Saida125957.000000
+Entrada:       5497,  Saida97014.000000
+Entrada:       4365,  Saida71337.000000
+Entrada:       3665,  Saida56507.000000
+Entrada:       6746,  Saida127466.000000
+Entrada:       2912,  Saida41584.000000
+Entrada:       6242,  Saida114930.000000
+Entrada:       4747,  Saida79780.000000
+Entrada:       1108,  Saida11465.000000
+Entrada:       4513,  Saida74580.000000
+Entrada:        231,  Saida1417.000000
+Entrada:       7569,  Saida148611.000000
+Entrada:       2152,  Saida27784.000000
+Entrada:        282,  Saida1849.000000
+Entrada:       5256,  Saida91385.000000
+Entrada:       6407,  Saida118998.000000
+Entrada:       3952,  Saida62482.000000
+Entrada:       7325,  Saida142258.000000
+Entrada:       2694,  Saida37486.000000
+Entrada:       6664,  Saida125405.000000
+Entrada:       3129,  Saida45766.000000
+Entrada:       7648,  Saida150683.000000
+Entrada:       3636,  Saida55911.000000
+Entrada:        983,  Saida9774.000000
+Entrada:       5549,  Saida98240.000000
+Entrada:       7764,  Saida153738.000000
+Entrada:       2664,  Saida36930.000000
+Entrada:       4200,  Saida67764.000000
+Entrada:       4000,  Saida63496.000000
+Entrada:       6766,  Saida127970.000000
+Entrada:       6190,  Saida113655.000000
+Entrada:       2436,  Saida32777.000000
+Entrada:       2587,  Saida35514.000000
+Entrada:        778,  Saida7155.000000
+Entrada:       3195,  Saida47057.000000
+Entrada:       4172,  Saida67162.000000
+Entrada:       7901,  Saida157365.000000
+Entrada:       3816,  Saida59632.000000
+Entrada:       5820,  Saida104688.000000
+Entrada:       4483,  Saida73919.000000
+Entrada:       6777,  Saida128248.000000
+Entrada:       1871,  Saida23055.000000
+Entrada:       4619,  Saida76924.000000
+Entrada:       7133,  Saida137308.000000
+Entrada:       4561,  Saida75639.000000
+Entrada:       2755,  Saida38621.000000
+Entrada:         25,  Saida73.000000
+Entrada:       6557,  Saida122727.000000
+Entrada:       4060,  Saida64769.000000
+Entrada:       4176,  Saida67248.000000
+Entrada:       5219,  Saida90528.000000
+Entrada:       4981,  Saida85066.000000
+Entrada:        457,  Saida3520.000000
+Entrada:        262,  Saida1676.000000
+Entrada:       6018,  Saida109464.000000
+Entrada:       4432,  Saida72800.000000
+Entrada:       6946,  Saida132530.000000
+Entrada:       6780,  Saida128324.000000
+Entrada:       5688,  Saida101534.000000
+Entrada:       6006,  Saida109173.000000
+Entrada:       3985,  Saida63179.000000
+Entrada:        805,  Saida7488.000000
+300 NS + 0 (stop 1: tb.cov = 1)
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  2
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model (reused)
+  data               :  ./cov_work/design/2/icc.data
+Coverage D:    0% (0/100)         DC:    0% (0/100)       
+
+Entrada:       1327,  Saida14582.000000
+Entrada:        538,  Saida4376.000000
+Entrada:       6400,  Saida118825.000000
+Entrada:       1209,  Saida12880.000000
+Entrada:       7313,  Saida141947.000000
+Entrada:       7828,  Saida155430.000000
+Entrada:       7897,  Saida157259.000000
+Entrada:       1811,  Saida22075.000000
+Entrada:       3999,  Saida63475.000000
+Entrada:       5998,  Saida108979.000000
+Entrada:       2924,  Saida41812.000000
+Entrada:       7067,  Saida135617.000000
+Entrada:       6137,  Saida112359.000000
+Entrada:       6391,  Saida118602.000000
+Entrada:       3436,  Saida51849.000000
+Entrada:       7478,  Saida146234.000000
+Entrada:       3736,  Saida57971.000000
+Entrada:       7479,  Saida146260.000000
+Entrada:       1875,  Saida23121.000000
+Entrada:       4417,  Saida72472.000000
+Entrada:       2582,  Saida35422.000000
+Entrada:       7461,  Saida145791.000000
+Entrada:        211,  Saida1256.000000
+Entrada:         60,  Saida235.000000
+Entrada:       5638,  Saida100346.000000
+Entrada:       4373,  Saida71511.000000
+Entrada:        916,  Saida8896.000000
+Entrada:       6142,  Saida112481.000000
+Entrada:       7177,  Saida138439.000000
+Entrada:       3500,  Saida53140.000000
+Entrada:       7601,  Saida149449.000000
+Entrada:       8034,  Saida160907.000000
+Entrada:       6803,  Saida128904.000000
+Entrada:       3773,  Saida58738.000000
+Entrada:       2584,  Saida35459.000000
+Entrada:       2011,  Saida25383.000000
+Entrada:        766,  Saida7009.000000
+Entrada:       5972,  Saida108349.000000
+Entrada:       2050,  Saida26042.000000
+Entrada:       5986,  Saida108688.000000
+Entrada:       5213,  Saida90389.000000
+Entrada:       6071,  Saida110751.000000
+Entrada:       3317,  Saida49468.000000
+Entrada:       7226,  Saida139700.000000
+Entrada:       2567,  Saida35148.000000
+Entrada:       2794,  Saida39352.000000
+Entrada:        393,  Saida2879.000000
+Entrada:       5265,  Saida91593.000000
+Entrada:       3252,  Saida48180.000000
+Entrada:       1467,  Saida16669.000000
+Entrada:       5117,  Saida88177.000000
+Entrada:        727,  Saida6537.000000
+Entrada:       2016,  Saida25468.000000
+Entrada:       1409,  Saida15796.000000
+Entrada:       4777,  Saida80453.000000
+Entrada:       5263,  Saida91547.000000
+Entrada:       3272,  Saida48576.000000
+Entrada:       6005,  Saida109148.000000
+Entrada:       4653,  Saida77680.000000
+Entrada:       1305,  Saida14261.000000
+Entrada:       2716,  Saida37894.000000
+Entrada:       1612,  Saida18901.000000
+Entrada:       4376,  Saida71576.000000
+Entrada:       7552,  Saida148166.000000
+Entrada:        107,  Saida508.000000
+Entrada:       6733,  Saida127139.000000
+Entrada:       6554,  Saida122652.000000
+Entrada:       7388,  Saida143892.000000
+Entrada:       5759,  Saida103228.000000
+Entrada:       1347,  Saida14876.000000
+Entrada:       7853,  Saida156092.000000
+Entrada:       1709,  Saida20433.000000
+Entrada:       7099,  Saida136436.000000
+Entrada:       4174,  Saida67205.000000
+Entrada:       5908,  Saida106804.000000
+Entrada:       3212,  Saida47392.000000
+Entrada:       3338,  Saida49886.000000
+Entrada:       4248,  Saida68799.000000
+Entrada:       6362,  Saida117885.000000
+Entrada:       7432,  Saida145035.000000
+Entrada:       4607,  Saida76658.000000
+Entrada:       6797,  Saida128753.000000
+Entrada:       1255,  Saida13537.000000
+Entrada:       5592,  Saida99256.000000
+Entrada:       7825,  Saida155350.000000
+Entrada:       5126,  Saida88384.000000
+Entrada:       7378,  Saida143632.000000
+Entrada:       3743,  Saida58116.000000
+Entrada:       4929,  Saida83884.000000
+Entrada:       4514,  Saida74602.000000
+Entrada:       3327,  Saida49667.000000
+Entrada:       3683,  Saida56877.000000
+Entrada:       5766,  Saida103395.000000
+Entrada:       5615,  Saida99801.000000
+Entrada:       7598,  Saida149371.000000
+Entrada:        959,  Saida9457.000000
+Entrada:         99,  Saida458.000000
+Entrada:       7181,  Saida138542.000000
+Entrada:       7809,  Saida154927.000000
+Entrada:       3646,  Saida56116.000000
+Entrada:       4518,  Saida74690.000000
+Entrada:         85,  Saida374.000000
+Entrada:        326,  Saida2244.000000
+Entrada:       3521,  Saida53566.000000
+Entrada:       6624,  Saida124402.000000
+Entrada:       1676,  Saida19908.000000
+Entrada:       7190,  Saida138773.000000
+Entrada:       1766,  Saida21346.000000
+Entrada:       5454,  Saida96003.000000
+Entrada:       7124,  Saida137077.000000
+Entrada:       1194,  Saida12667.000000
+Entrada:       4021,  Saida63941.000000
+Entrada:        347,  Saida2438.000000
+Entrada:       3241,  Saida47963.000000
+Entrada:       5523,  Saida97626.000000
+Entrada:       4016,  Saida63835.000000
+Entrada:       4389,  Saida71860.000000
+Entrada:       4068,  Saida64939.000000
+Entrada:       7439,  Saida145218.000000
+Entrada:        225,  Saida1368.000000
+Entrada:       3769,  Saida58655.000000
+Entrada:       1242,  Saida13350.000000
+Entrada:       6439,  Saida119791.000000
+Entrada:       3036,  Saida43961.000000
+Entrada:       8141,  Saida163771.000000
+Entrada:       7369,  Saida143399.000000
+Entrada:       4663,  Saida77903.000000
+Entrada:       1854,  Saida22776.000000
+Entrada:       4387,  Saida71816.000000
+Entrada:       2605,  Saida35843.000000
+Entrada:       5941,  Saida107600.000000
+Entrada:       3968,  Saida62820.000000
+Entrada:       6497,  Saida121232.000000
+Entrada:       6839,  Saida129815.000000
+Entrada:       2041,  Saida25890.000000
+Entrada:        730,  Saida6573.000000
+Entrada:       5208,  Saida90274.000000
+Entrada:       5400,  Saida94738.000000
+Entrada:       4753,  Saida79914.000000
+Entrada:       2734,  Saida38229.000000
+Entrada:       6322,  Saida116898.000000
+Entrada:       3319,  Saida49508.000000
+Entrada:       6902,  Saida131411.000000
+Entrada:       3917,  Saida61745.000000
+Entrada:       5400,  Saida94738.000000
+Entrada:       8187,  Saida165006.000000
+Entrada:       4277,  Saida69425.000000
+Entrada:       6909,  Saida131589.000000
+Entrada:       1357,  Saida15024.000000
+Entrada:       3755,  Saida58364.000000
+Entrada:       6018,  Saida109464.000000
+Entrada:       8163,  Saida164361.000000
+Entrada:       4343,  Saida70858.000000
+Entrada:       6509,  Saida121531.000000
+Entrada:       6739,  Saida127290.000000
+Entrada:        780,  Saida7180.000000
+Entrada:       6642,  Saida124853.000000
+Entrada:       4582,  Saida76104.000000
+Entrada:       4614,  Saida76813.000000
+Entrada:       1851,  Saida22727.000000
+Entrada:       4900,  Saida83226.000000
+Entrada:       1859,  Saida22858.000000
+Entrada:       2470,  Saida33388.000000
+Entrada:       5100,  Saida87786.000000
+Entrada:        676,  Saida5933.000000
+Entrada:       7012,  Saida134211.000000
+Entrada:       2207,  Saida28734.000000
+Entrada:       7216,  Saida139443.000000
+Entrada:       2375,  Saida31687.000000
+Entrada:       3185,  Saida46861.000000
+Entrada:         40,  Saida137.000000
+Entrada:       7417,  Saida144645.000000
+Entrada:        716,  Saida6405.000000
+Entrada:       5239,  Saida90991.000000
+Entrada:       7796,  Saida154583.000000
+Entrada:        196,  Saida1139.000000
+Entrada:       4288,  Saida69664.000000
+Entrada:       5745,  Saida102893.000000
+Entrada:        104,  Saida489.000000
+Entrada:       5149,  Saida88913.000000
+Entrada:       2937,  Saida42060.000000
+Entrada:       6384,  Saida118429.000000
+Entrada:       1116,  Saida11576.000000
+Entrada:       3966,  Saida62777.000000
+Entrada:       5754,  Saida103108.000000
+Entrada:        449,  Saida3438.000000
+Entrada:       1712,  Saida20480.000000
+Entrada:       4876,  Saida82683.000000
+Entrada:       7346,  Saida142802.000000
+Entrada:       2688,  Saida37374.000000
+Entrada:       6937,  Saida132301.000000
+Entrada:        497,  Saida3937.000000
+Entrada:       2155,  Saida27835.000000
+Entrada:       7474,  Saida146129.000000
+Entrada:       5967,  Saida108228.000000
+Entrada:       4508,  Saida74470.000000
+Entrada:       6621,  Saida124327.000000
+Entrada:       7148,  Saida137693.000000
+Entrada:       3082,  Saida44851.000000
+Entrada:       6318,  Saida116799.000000
+500 NS + 0 (stop 1: tb.cov = 1)
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  3
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model (reused)
+  data               :  ./cov_work/design/3/icc.data
+Coverage D:    0% (0/100)         DC:    0% (0/100)       
+
+Entrada:       4467,  Saida73568.000000
+Entrada:       3258,  Saida48299.000000
+Entrada:       1388,  Saida15483.000000
+Entrada:       7537,  Saida147774.000000
+Entrada:       4606,  Saida76636.000000
+Entrada:       3680,  Saida56815.000000
+Entrada:       2151,  Saida27766.000000
+Entrada:       1679,  Saida19956.000000
+Entrada:       8191,  Saida165113.000000
+Entrada:       2574,  Saida35276.000000
+Entrada:       5029,  Saida86161.000000
+Entrada:       3919,  Saida61787.000000
+Entrada:       3411,  Saida51346.000000
+Entrada:       3028,  Saida43807.000000
+Entrada:       5535,  Saida97909.000000
+Entrada:       7377,  Saida143606.000000
+Entrada:       5505,  Saida97202.000000
+Entrada:       8050,  Saida161335.000000
+Entrada:       2443,  Saida32903.000000
+Entrada:       3580,  Saida54766.000000
+Entrada:        154,  Saida825.000000
+Entrada:       2211,  Saida28804.000000
+Entrada:       6605,  Saida123926.000000
+Entrada:       1557,  Saida18046.000000
+Entrada:       1805,  Saida21977.000000
+Entrada:       7609,  Saida149659.000000
+Entrada:       5656,  Saida100773.000000
+Entrada:         10,  Saida22.000000
+Entrada:       1782,  Saida21604.000000
+Entrada:       6887,  Saida131031.000000
+Entrada:       1002,  Saida10027.000000
+Entrada:       6443,  Saida119890.000000
+Entrada:       2958,  Saida42462.000000
+Entrada:       7521,  Saida147356.000000
+Entrada:       5453,  Saida95980.000000
+Entrada:       5322,  Saida92918.000000
+Entrada:       5513,  Saida97391.000000
+Entrada:       6974,  Saida133242.000000
+Entrada:       1213,  Saida12936.000000
+Entrada:        762,  Saida6960.000000
+Entrada:       6336,  Saida117243.000000
+Entrada:       4313,  Saida70206.000000
+Entrada:       3338,  Saida49886.000000
+Entrada:       2703,  Saida37653.000000
+Entrada:       6642,  Saida124853.000000
+Entrada:       7895,  Saida157206.000000
+Entrada:       5864,  Saida105745.000000
+Entrada:        942,  Saida9234.000000
+Entrada:       5395,  Saida94621.000000
+Entrada:       2202,  Saida28648.000000
+Entrada:       5060,  Saida86870.000000
+Entrada:       5335,  Saida93221.000000
+Entrada:       4019,  Saida63899.000000
+Entrada:       2347,  Saida31190.000000
+Entrada:       2406,  Saida32240.000000
+Entrada:       4856,  Saida82232.000000
+Entrada:       5002,  Saida85544.000000
+Entrada:       5490,  Saida96849.000000
+Entrada:       1705,  Saida20369.000000
+Entrada:       5795,  Saida104089.000000
+Entrada:       1740,  Saida20928.000000
+Entrada:       2284,  Saida30079.000000
+Entrada:       7710,  Saida152314.000000
+Entrada:        192,  Saida1108.000000
+Entrada:       6861,  Saida130372.000000
+Entrada:       6420,  Saida119320.000000
+Entrada:       7638,  Saida150420.000000
+Entrada:       4700,  Saida78728.000000
+Entrada:       5967,  Saida108228.000000
+Entrada:       7514,  Saida147173.000000
+Entrada:       3267,  Saida48477.000000
+Entrada:       1861,  Saida22891.000000
+Entrada:       2343,  Saida31119.000000
+Entrada:       4307,  Saida70076.000000
+Entrada:       2211,  Saida28804.000000
+Entrada:        579,  Saida4826.000000
+Entrada:       3914,  Saida61682.000000
+Entrada:       1802,  Saida21928.000000
+Entrada:        689,  Saida6085.000000
+Entrada:       7661,  Saida151024.000000
+Entrada:       3888,  Saida61137.000000
+Entrada:       3330,  Saida49727.000000
+Entrada:       5830,  Saida104928.000000
+Entrada:       3185,  Saida46861.000000
+Entrada:       7495,  Saida146677.000000
+Entrada:        512,  Saida4096.000000
+Entrada:       6219,  Saida114365.000000
+Entrada:       3704,  Saida57310.000000
+Entrada:       1445,  Saida16336.000000
+Entrada:       1737,  Saida20880.000000
+Entrada:       2063,  Saida26262.000000
+Entrada:       4514,  Saida74602.000000
+Entrada:       1799,  Saida21880.000000
+Entrada:       3276,  Saida48655.000000
+Entrada:       5410,  Saida94972.000000
+Entrada:       3632,  Saida55829.000000
+Entrada:       1958,  Saida24495.000000
+Entrada:        242,  Saida1508.000000
+Entrada:       6466,  Saida120461.000000
+Entrada:        803,  Saida7464.000000
+Entrada:       7602,  Saida149476.000000
+Entrada:       1855,  Saida22792.000000
+Entrada:       1553,  Saida17984.000000
+Entrada:       1245,  Saida13393.000000
+Entrada:       4303,  Saida69989.000000
+Entrada:       2328,  Saida30854.000000
+Entrada:       1353,  Saida14965.000000
+Entrada:       6981,  Saida133421.000000
+Entrada:       6897,  Saida131285.000000
+Entrada:       7013,  Saida134237.000000
+Entrada:       5947,  Saida107745.000000
+Entrada:       2976,  Saida42807.000000
+Entrada:       4187,  Saida67484.000000
+Entrada:       4806,  Saida81105.000000
+Entrada:       1911,  Saida23715.000000
+Entrada:        884,  Saida8484.000000
+Entrada:       5637,  Saida100322.000000
+Entrada:        962,  Saida9497.000000
+Entrada:       7575,  Saida148768.000000
+Entrada:       7163,  Saida138079.000000
+Entrada:       8107,  Saida162860.000000
+Entrada:       2991,  Saida43095.000000
+Entrada:       4211,  Saida68001.000000
+Entrada:       7074,  Saida135796.000000
+Entrada:       3317,  Saida49468.000000
+Entrada:       2083,  Saida26602.000000
+Entrada:       3731,  Saida57867.000000
+Entrada:       1685,  Saida20051.000000
+Entrada:       5402,  Saida94785.000000
+Entrada:       7914,  Saida157711.000000
+Entrada:       3085,  Saida44910.000000
+Entrada:       2396,  Saida32061.000000
+Entrada:       3193,  Saida47018.000000
+Entrada:        946,  Saida9287.000000
+Entrada:       7879,  Saida156781.000000
+Entrada:       8097,  Saida162592.000000
+Entrada:       2380,  Saida31776.000000
+Entrada:       8030,  Saida160800.000000
+Entrada:       2333,  Saida30942.000000
+Entrada:       7521,  Saida147356.000000
+Entrada:       1668,  Saida19782.000000
+Entrada:       2045,  Saida25957.000000
+Entrada:       1903,  Saida23582.000000
+Entrada:       6853,  Saida130169.000000
+Entrada:       2548,  Saida34802.000000
+Entrada:       4630,  Saida77169.000000
+Entrada:       5108,  Saida87970.000000
+Entrada:       3828,  Saida59882.000000
+Entrada:       4382,  Saida71707.000000
+Entrada:       7007,  Saida134084.000000
+Entrada:       5720,  Saida102297.000000
+Entrada:       1084,  Saida11135.000000
+Entrada:       6512,  Saida121605.000000
+Entrada:       3810,  Saida59507.000000
+Entrada:       6307,  Saida116528.000000
+Entrada:       2331,  Saida30907.000000
+Entrada:       4758,  Saida80026.000000
+Entrada:       1637,  Saida19293.000000
+Entrada:       6788,  Saida128525.000000
+Entrada:       6527,  Saida121979.000000
+Entrada:       3641,  Saida56014.000000
+Entrada:       2849,  Saida40388.000000
+Entrada:       1383,  Saida15409.000000
+Entrada:       2982,  Saida42922.000000
+Entrada:        528,  Saida4268.000000
+Entrada:       7413,  Saida144541.000000
+Entrada:        351,  Saida2476.000000
+Entrada:       1882,  Saida23236.000000
+Entrada:       6581,  Saida123326.000000
+Entrada:       6460,  Saida120312.000000
+Entrada:       7922,  Saida157923.000000
+Entrada:       7519,  Saida147304.000000
+Entrada:       3165,  Saida46469.000000
+Entrada:       6482,  Saida120859.000000
+Entrada:       3069,  Saida44599.000000
+Entrada:       5197,  Saida90020.000000
+Entrada:       7028,  Saida134620.000000
+Entrada:       7222,  Saida139597.000000
+Entrada:       3905,  Saida61493.000000
+Entrada:       2404,  Saida32204.000000
+Entrada:       4706,  Saida78862.000000
+Entrada:       7600,  Saida149423.000000
+Entrada:       7601,  Saida149449.000000
+Entrada:       7727,  Saida152762.000000
+Entrada:       6655,  Saida125179.000000
+Entrada:       5496,  Saida96990.000000
+Entrada:       7613,  Saida149764.000000
+Entrada:       5030,  Saida86183.000000
+Entrada:       4481,  Saida73875.000000
+Entrada:       2705,  Saida37690.000000
+Entrada:        713,  Saida6370.000000
+Entrada:        240,  Saida1491.000000
+Entrada:       5840,  Saida105168.000000
+Entrada:       5544,  Saida98122.000000
+Entrada:       7269,  Saida140810.000000
+Entrada:       4892,  Saida83045.000000
+Entrada:       7522,  Saida147382.000000
+Entrada:       1348,  Saida14891.000000
+Entrada:       3983,  Saida63136.000000
+Entrada:       2926,  Saida41850.000000
+700 NS + 0 (stop 1: tb.cov = 1)
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  4
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model (reused)
+  data               :  ./cov_work/design/4/icc.data
+Coverage D:    0% (0/100)         DC:    0% (0/100)       
+
+Entrada:       4569,  Saida75816.000000
+Entrada:       2664,  Saida36930.000000
+Entrada:        889,  Saida8548.000000
+Entrada:       6472,  Saida120610.000000
+Entrada:       3518,  Saida53505.000000
+Entrada:       2767,  Saida38846.000000
+Entrada:       7898,  Saida157286.000000
+Entrada:       2848,  Saida40369.000000
+Entrada:       1645,  Saida19419.000000
+Entrada:       3726,  Saida57764.000000
+Entrada:       2516,  Saida34220.000000
+Entrada:       6815,  Saida129208.000000
+Entrada:       2278,  Saida29974.000000
+Entrada:       3241,  Saida47963.000000
+Entrada:       2696,  Saida37523.000000
+Entrada:       3078,  Saida44774.000000
+Entrada:       6293,  Saida116183.000000
+Entrada:       4523,  Saida74800.000000
+Entrada:       2596,  Saida35678.000000
+Entrada:        530,  Saida4289.000000
+Entrada:       7149,  Saida137719.000000
+Entrada:       4851,  Saida82119.000000
+Entrada:       5818,  Saida104640.000000
+Entrada:       1543,  Saida17830.000000
+Entrada:       1868,  Saida23006.000000
+Entrada:        168,  Saida927.000000
+Entrada:       1817,  Saida22172.000000
+Entrada:       7536,  Saida147748.000000
+Entrada:       5309,  Saida92615.000000
+Entrada:       2842,  Saida40256.000000
+Entrada:       4734,  Saida79489.000000
+Entrada:       8100,  Saida162672.000000
+Entrada:       1043,  Saida10577.000000
+Entrada:        501,  Saida3979.000000
+Entrada:       6666,  Saida125455.000000
+Entrada:       1470,  Saida16714.000000
+Entrada:       2493,  Saida33804.000000
+Entrada:       1015,  Saida10200.000000
+Entrada:       3271,  Saida48556.000000
+Entrada:       6057,  Saida110410.000000
+Entrada:       4693,  Saida78572.000000
+Entrada:        757,  Saida6899.000000
+Entrada:       5152,  Saida88982.000000
+Entrada:        652,  Saida5654.000000
+Entrada:       6733,  Saida127139.000000
+Entrada:        453,  Saida3479.000000
+Entrada:       4207,  Saida67915.000000
+Entrada:       3588,  Saida54929.000000
+Entrada:       2775,  Saida38996.000000
+Entrada:       4733,  Saida79466.000000
+Entrada:       2566,  Saida35130.000000
+Entrada:       1609,  Saida18854.000000
+Entrada:        827,  Saida7763.000000
+Entrada:       6480,  Saida120809.000000
+Entrada:       7125,  Saida137103.000000
+Entrada:       3530,  Saida53748.000000
+Entrada:       6321,  Saida116873.000000
+Entrada:       2499,  Saida33912.000000
+Entrada:       1012,  Saida10160.000000
+Entrada:       3126,  Saida45707.000000
+Entrada:         25,  Saida73.000000
+Entrada:         23,  Saida65.000000
+Entrada:       1871,  Saida23055.000000
+Entrada:       6705,  Saida126434.000000
+Entrada:       3547,  Saida54094.000000
+Entrada:       1866,  Saida22973.000000
+Entrada:       5845,  Saida105288.000000
+Entrada:       1310,  Saida14334.000000
+Entrada:       6360,  Saida117836.000000
+Entrada:       6488,  Saida121008.000000
+Entrada:       5252,  Saida91292.000000
+Entrada:       1828,  Saida22351.000000
+Entrada:       1837,  Saida22498.000000
+Entrada:       6437,  Saida119741.000000
+Entrada:       6412,  Saida119122.000000
+Entrada:       3382,  Saida50765.000000
+Entrada:          0,  Saida0.000000
+Entrada:       7770,  Saida153896.000000
+Entrada:       3883,  Saida61032.000000
+Entrada:       4940,  Saida84134.000000
+Entrada:       7519,  Saida147304.000000
+Entrada:        835,  Saida7863.000000
+Entrada:       2849,  Saida40388.000000
+Entrada:       4103,  Saida65685.000000
+Entrada:       8017,  Saida160453.000000
+Entrada:       6868,  Saida130549.000000
+Entrada:       5600,  Saida99445.000000
+Entrada:       2236,  Saida29239.000000
+Entrada:       1850,  Saida22711.000000
+Entrada:       1039,  Saida10523.000000
+Entrada:       7566,  Saida148533.000000
+Entrada:       5276,  Saida91849.000000
+Entrada:       7811,  Saida154980.000000
+Entrada:       7065,  Saida135566.000000
+Entrada:       2260,  Saida29658.000000
+Entrada:       1577,  Saida18356.000000
+Entrada:       7753,  Saida153447.000000
+Entrada:       6520,  Saida121805.000000
+Entrada:       7889,  Saida157047.000000
+Entrada:       2530,  Saida34474.000000
+Entrada:        886,  Saida8510.000000
+Entrada:       1721,  Saida20624.000000
+Entrada:       3059,  Saida44406.000000
+Entrada:       2122,  Saida27268.000000
+Entrada:       6040,  Saida109997.000000
+Entrada:        418,  Saida3125.000000
+Entrada:       3901,  Saida61409.000000
+Entrada:       4325,  Saida70466.000000
+Entrada:       4395,  Saida71991.000000
+Entrada:       7515,  Saida147199.000000
+Entrada:       2849,  Saida40388.000000
+Entrada:       3010,  Saida43460.000000
+Entrada:       6560,  Saida122802.000000
+Entrada:       3523,  Saida53606.000000
+Entrada:       2574,  Saida35276.000000
+Entrada:       6552,  Saida122602.000000
+Entrada:       2104,  Saida26960.000000
+Entrada:       4581,  Saida76082.000000
+Entrada:        496,  Saida3926.000000
+Entrada:       5173,  Saida89466.000000
+Entrada:       7200,  Saida139030.000000
+Entrada:       2487,  Saida33695.000000
+Entrada:       7519,  Saida147304.000000
+Entrada:       4405,  Saida72210.000000
+Entrada:       5649,  Saida100607.000000
+Entrada:       7685,  Saida151656.000000
+Entrada:       2008,  Saida25333.000000
+Entrada:       4388,  Saida71838.000000
+Entrada:       5015,  Saida85841.000000
+Entrada:       8118,  Saida163154.000000
+Entrada:       6062,  Saida110532.000000
+Entrada:       5227,  Saida90713.000000
+Entrada:       7738,  Saida153052.000000
+Entrada:       1352,  Saida14950.000000
+Entrada:       8144,  Saida163851.000000
+Entrada:       7437,  Saida145166.000000
+Entrada:       5979,  Saida108519.000000
+Entrada:       4736,  Saida79533.000000
+Entrada:       4892,  Saida83045.000000
+Entrada:        324,  Saida2225.000000
+Entrada:       1549,  Saida17923.000000
+Entrada:       5860,  Saida105649.000000
+Entrada:       4945,  Saida84247.000000
+Entrada:       1143,  Saida11951.000000
+Entrada:       1127,  Saida11728.000000
+Entrada:       3333,  Saida49787.000000
+Entrada:       6612,  Saida124102.000000
+Entrada:        408,  Saida3026.000000
+Entrada:       4341,  Saida70814.000000
+Entrada:       4408,  Saida72275.000000
+Entrada:       1317,  Saida14436.000000
+Entrada:       4475,  Saida73744.000000
+Entrada:       5169,  Saida89373.000000
+Entrada:       5966,  Saida108204.000000
+Entrada:        170,  Saida942.000000
+Entrada:       6684,  Saida125907.000000
+Entrada:       1698,  Saida20257.000000
+Entrada:       5203,  Saida90158.000000
+Entrada:       4350,  Saida71010.000000
+Entrada:       1850,  Saida22711.000000
+Entrada:       6415,  Saida119196.000000
+Entrada:       1809,  Saida22042.000000
+Entrada:        652,  Saida5654.000000
+Entrada:       1826,  Saida22319.000000
+Entrada:       4445,  Saida73085.000000
+Entrada:       1835,  Saida22465.000000
+Entrada:       1542,  Saida17815.000000
+Entrada:       3092,  Saida45046.000000
+Entrada:       2893,  Saida41222.000000
+Entrada:       5793,  Saida104041.000000
+Entrada:       3399,  Saida51106.000000
+Entrada:       4356,  Saida71141.000000
+Entrada:       6751,  Saida127592.000000
+Entrada:       5673,  Saida101177.000000
+Entrada:       3282,  Saida48774.000000
+Entrada:       6677,  Saida125731.000000
+Entrada:       8030,  Saida160800.000000
+Entrada:       7910,  Saida157605.000000
+Entrada:       4301,  Saida69945.000000
+Entrada:        380,  Saida2752.000000
+Entrada:       4928,  Saida83861.000000
+Entrada:       1352,  Saida14950.000000
+Entrada:       1420,  Saida15961.000000
+Entrada:       8175,  Saida164684.000000
+Entrada:       3631,  Saida55809.000000
+Entrada:       7048,  Saida135131.000000
+Entrada:       1490,  Saida17018.000000
+Entrada:       3897,  Saida61325.000000
+Entrada:       7945,  Saida158535.000000
+Entrada:       1268,  Saida13724.000000
+Entrada:       7199,  Saida139005.000000
+Entrada:       6899,  Saida131335.000000
+Entrada:        204,  Saida1201.000000
+Entrada:       1046,  Saida10618.000000
+Entrada:       3498,  Saida53100.000000
+Entrada:       7551,  Saida148140.000000
+Entrada:       3602,  Saida55215.000000
+Entrada:       2161,  Saida27939.000000
+Entrada:       4759,  Saida80049.000000
+Entrada:       2525,  Saida34383.000000
+900 NS + 0 (stop 1: tb.cov = 1)
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  5
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model (reused)
+  data               :  ./cov_work/design/5/icc.data
+================================= Coverage completed =================================
+
+coverage setup:
+  workdir  :  ./cov_work
+  dutinst  :  tb(tb)
+  design   :  design
+  testname :  test
+
+coverage files:
+  model(design data) :  ./cov_work/design/00000000_1bcdc2aa.model (reused)
+  data               :  ./cov_work/design/test/icc.data
+TOOL:	irun	08.10-s008: Exiting on Apr 15, 2009 at 18:05:29 BRT  (total: 00:02:01)
