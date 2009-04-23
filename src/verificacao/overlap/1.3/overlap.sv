@@ -50,7 +50,7 @@ module overlap(input reset, clk,
     out_overlap_driver_i.out_overlap_from_duv.connect(out_overlap_refmod_driver.get_export);
     
 
-    run_test(); 
+    //run_test(); 
   end
 
 
