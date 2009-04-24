@@ -1,4 +1,6 @@
 `include "AACHuffmanDecoder.svh"
+`include "reescalador.svh"
+`include "dequantizador.svh"
 
 parameter ID_SCE = 0;
 parameter ID_CPE = 1;
@@ -48,6 +50,9 @@ class refmod_decodificadorAAC extends ovm_component;
    endfunction
 
 	AACHuffmanDecoder huffmanDecoder;
+	reescalador reescalador = new();
+	dequantizador dequantizador = new();
+	
 	int id_syn_ele, global_gain, num_window_groups, max_sfb;
 	bit[7:0] scale_factor_grouping;
 	bit[1:0] window_sequence;
@@ -57,8 +62,8 @@ class refmod_decodificadorAAC extends ovm_component;
 	int sect_sfb_offset[7:0][48:0]; //offset dos coeficientes para cada banda de cada grupo
 	int swb_offset[48:0]; // offset de coeficientes em cada swb
 	int sf[7:0][48:0]; //sf[g][sfb] => fatores de escala da banda sfb de um grupo g
-	int coefsR[1023:0]; //coeficientes espectrais
-	int coefsL[1023:0]; //coeficientes espectrais
+	int coefsR[1023:0]; //coeficientes espectrais canal direito
+	int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
 	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
 	bit window_shape;
 	raw_data_block raw;
@@ -554,7 +559,7 @@ class refmod_decodificadorAAC extends ovm_component;
       end //fim do while(1)
     endtask
 
-	task apply_quantization();
+	task apply_quantizationToChannels();
 		int width = 0;
 		$display("########### DEQUANTIZACAO ... ");
 		for(int g; g < num_window_groups ; g++)begin
@@ -563,7 +568,7 @@ class refmod_decodificadorAAC extends ovm_component;
 				for(int win = 0; win < window_group_length[g] ; win++)begin
 					for(int bin = 0; bin < width; bin++)begin
 							/*x_invquant[g][win][sfb][bin] = sign(x_quant[g][win][sfb][bin]) *
-abs(x_quant[g][win][sfb][bin]) ^(4/3);*/			
+abs(x_quant[g][win][sfb][bin])^(4/3);*/			
 					end
 				end
 			end
@@ -571,8 +576,9 @@ abs(x_quant[g][win][sfb][bin]) ^(4/3);*/
 		
 	endtask
 	
-	task apply_reescaler(ics_info ics_info);
+	task apply_reescalerToChannels(ics_info ics_info);
 		int width = 0;
+		int index = 0;
 		$display("########### REESCALAMENTO ... ");
 		for(int g; g < num_window_groups ; g++)begin
 			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
