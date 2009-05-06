@@ -31,45 +31,8 @@ class overlap_aac;
 			//return
 			//overlap = coef_pcm_out;
    endfunction
- 
- 
+    
+   function void teste();
+      $display("Teste Overlap");
+   endfunction 
  endclass
-
-/*
-	 
-class refmod_overlap;
-
-	//modelo de referência
-	overlap_aac refmod;
-
-
-  function new();
-	endfunction
-
-
-  task run();
-		while(1) begin
-			
-			
-			int pcm_out[3 : 0];
-			int pcm_in[3 : 0];
-			
-			
-			foreach(pcm_in[i])
-			 pcm_in[i] = $urandom();
-			///////////////////////////CARREGANDO/////////////////////////////////////
-			foreach(pcm_out[i])
-				pcm_out[i] = $urandom();
-									
-				
-			//chama a transformada
-			refmod = new();
-			refmod.overlap(1, pcm_in, pcm_out);
-					
-			////////////////////////////DESCARREGANDO/////////////////////////////
-			foreach(pcm_out[i])
-	     $display(pcm_out[i]);
-					
-		end
-	endtask
-endclass*/

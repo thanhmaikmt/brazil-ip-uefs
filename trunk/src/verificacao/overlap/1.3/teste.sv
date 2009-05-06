@@ -5,12 +5,13 @@ module teste;
 
 `include "overlap_aac.sv"
 
-refmod_overlap rfmd;
+overlap_aac overlap_instance;
 
 
 initial begin
-  rfmd = new();
-  rfmd.run();
+  overlap_instance = new();
+  
+  overlap_instance.teste();
 end
 
 
