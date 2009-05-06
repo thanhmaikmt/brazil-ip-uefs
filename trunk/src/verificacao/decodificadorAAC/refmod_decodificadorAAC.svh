@@ -62,8 +62,9 @@ class refmod_decodificadorAAC extends ovm_component;
 	int sect_sfb_offset[7:0][48:0]; //offset dos coeficientes para cada banda de cada grupo
 	int swb_offset[48:0]; // offset de coeficientes em cada swb
 	int sf[7:0][48:0]; //sf[g][sfb] => fatores de escala da banda sfb de um grupo g
-	int coefsR[1023:0]; //coeficientes espectrais canal direito
-	int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
+	int coefs[7:0][48:0][7:0][1023:0]; // coeficientes do canal
+	//int coefsR[1023:0]; //coeficientes espectrais canal direito
+	//int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
 	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
 	bit window_shape;
 	raw_data_block raw;
@@ -123,7 +124,7 @@ class refmod_decodificadorAAC extends ovm_component;
 					sect_sfb_offset[g][sect_sfb++] = offset;
 					offset += width;
 				end
-				sect_sfb_offset[g][sect_sfb] = offset; //FIXME banda 14 não existe!!
+				//sect_sfb_offset[g][sect_sfb] = offset; //FIXME banda 14 não existe!!
 			end
 		end	
 		else begin
@@ -135,7 +136,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			window_group_length[num_window_groups-1] = 1;
 			num_swb = 49;
 			/* preparação do sect_sfb_offset para janelas longas */
-			/* also copy the last value! */
+			
 			for (int i = 0; i < max_sfb + 1; i++) begin
 				sect_sfb_offset[0][i] = get_swb_offset_long_window(i);
 				swb_offset[i] = get_swb_offset_long_window(i);
@@ -323,21 +324,23 @@ class refmod_decodificadorAAC extends ovm_component;
 	endtask
 	
 	task handle_spectral_data(spectral_data spectral_data);		
+		int swb, group_size, win, start_win_group, swb_offset = 0;
 		int coef_index = 0;
 		int dim, index, lav, mod, off = 0;
 		int w,x,y,z;
 		bit[20:0] hcod_esc_y, hcod_esc_z;
-		int coefs[1023:0];
 		$display("##### SPECTRAL_FACTOR_DATA ... " );
 	
 		//processa as informações relativas aos coeficientes espectrais		
-		for(int g=0; g< num_window_groups; g++) begin
+		for(int g=0; g< num_window_groups; g++) begin			
 			//$display("## num_window_groups= %d | num_sec[0] = %d | " , num_window_groups,  num_sec[0] );
-			for(int i=0; i< num_sec[g]; i++) begin
+			for(int i=0; i< num_sec[g]; i++) begin					
+				win = start_win_group;
 			//	$display("## num_window_groups= %d | num_sec[%d] = %d | sect_sfb_offset[start]=  | sect_sfb_offset[end]= " , num_window_groups, g,  num_sec[g] );
 				if(sect_codebook[g][i] != ZERO_HCB && sect_codebook[g][i] <= ESC_HCB) begin //11= ESC_HCB
 					huffmanDecoder = new(sect_codebook[g][i]);
-					for(int k=sect_sfb_offset[g][sect_start[g][i]] ; k< sect_sfb_offset[g][sect_end[g][i]];) begin			
+					swb	= sect_start[g][i];		
+					for(int k=sect_sfb_offset[g][sect_start[g][i]] ; k< sect_sfb_offset[g][sect_end[g][i]];) begin								
 						if(sect_codebook[g][i] <= FIRST_PAIR_HCB) begin 
 						/*livros de código para quadruplas de coeficientes*/
 							dim = 4;
@@ -377,8 +380,7 @@ class refmod_decodificadorAAC extends ovm_component;
 							index-= (x+off)*(mod*mod);
 							y = index/mod - off;
 							index -= (y+off)*mod;
-							z = index - off;
-							k += 4;
+							z = index - off;							
 
 							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
 								//$display("### QUAD SEM SINAL");	
@@ -391,16 +393,15 @@ class refmod_decodificadorAAC extends ovm_component;
 								if (z != 0 && spectral_data.quad_sign_bits[coef_index][0])
 									z = -z;								
 							end	
-							coefs[coef_index++] = w;
-							coefs[coef_index++] = x;
-							coefs[coef_index++] = y;
-							coefs[coef_index++] = z;
+							coefs[g][sfb][win][k++] = w;
+							coefs[g][sfb][win][k++] = x;
+							coefs[g][sfb][win][k++] = y;
+							coefs[g][sfb][win][k++] = z;
 						end
 						else if(dim == 2) begin
 							y = index/mod - off;
 							index -= (y+off)*mod;
 							z = index - off;
-							k += 2;
 
 							if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
 								//$display("### PAIR SEM SINAL");
@@ -416,14 +417,39 @@ class refmod_decodificadorAAC extends ovm_component;
 								if(z == ESC_FLAG)
 									hcod_esc_z = spectral_data.hcod_esc_z[coef_index]; 
 							end							
-							coefs[coef_index++] = y;
-							coefs[coef_index++] = z;
+							coefs[g][sfb][win][k++] = y;
+							coefs[g][sfb][win][k++] = z;
 						end
-		
+						
+						//verifica swb e janela
+						if (window_sequence == EIGHT_SHORT_SEQUENCE)	
+							swb_offset = get_swb_offset_short_window(swb);
+						else
+							swb_offset = get_swb_offset_long_window(swb);
+							
+						if (k == swb_offset) begin
+							//ja pegou todos os coeficientes de uma sfb, entao tem que passar para a proxima sfb da janela
+							swb++;							
+							if (swb > sect_end[g][i] ) begin
+								//chegou ao final das sfbs de uma janela, entao tem que passar para a proxima janela da secao
+								swb = sect_start[g][i];								
+								win ++;
+								k = sect_sfb_offset[g][sect_start[g][i]];
+								if ( win >  start_win_group + window_group_length[g] ) begin
+									//terminou a secao de um grupo
+									break;
+								end
+							end
+						end
 					end
 				end
-			end			
+			end		
+			//a cada novo grupo configura a janela como sendo a primeira janela do proximo grupo
+			start_win_group = start_win_group + window_group_length[g];
+			
 		end
+		
+		/*
 		if( nChannels%2 == 0)  begin			
 			//se for par estamos recebendo o canal esquerdo
 			$display("### Coeficientes canal esquerdo: ");
@@ -440,6 +466,7 @@ class refmod_decodificadorAAC extends ovm_component;
 				$display("### Coef[%d] = %d " , i, coefs[i] );
 			end
 		end	
+		*/
 	endtask
 	
    task run();
