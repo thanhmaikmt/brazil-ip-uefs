@@ -62,7 +62,9 @@ class refmod_decodificadorAAC extends ovm_component;
 	int sect_sfb_offset[7:0][48:0]; //offset dos coeficientes para cada banda de cada grupo
 	int swb_offset[48:0]; // offset de coeficientes em cada swb
 	int sf[7:0][48:0]; //sf[g][sfb] => fatores de escala da banda sfb de um grupo g
-	int coefs[7:0][48:0][7:0][1023:0]; // coeficientes do canal
+	int x_quant[7:0][48:0][7:0][1023:0]; // coeficientes do canal ainda quantizados
+	int x_invquant[7:0][48:0][7:0][1023:0]; // coeficientes do canal dequantizados e ainda nao reescalados
+	int x_rescal[7:0][48:0][7:0][1023:0]; // coeficientes do canal  dequantizados e reescalados
 	//int coefsR[1023:0]; //coeficientes espectrais canal direito
 	//int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
 	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
@@ -243,7 +245,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			
 		handle_spectral_data(ics.spectral_data);
 		
-		nChannels++;
+		//nChannels++;
 		/*	
 		//TESTE - envia os coefs para o checker
 		for(int i=0; i< 64 ; i++) begin			
@@ -324,8 +326,21 @@ class refmod_decodificadorAAC extends ovm_component;
 	endtask
 	
 	task handle_spectral_data(spectral_data spectral_data);		
-		int swb, group_size, win, start_win_group, swb_offset = 0;
-		int coef_index = 0;
+	/*
+		swb = banda de fator de escala de uma unica janela
+		win = indice da janela dentro de um grupo
+		start_win_group = indice da primeira janela de um grupo
+		swb_width = quantidade de coeficientes de uma swb
+		bin = indice do coeficiente dentro de uma swb
+		coef_index  = indice auxiliar para acessar os termos do spectral_data
+		dim = dimensao do livro de codigo
+		index = valor de retorno do livro de codigo para um codeword
+		lav = mairo valor absoluto do livro de codigo
+		mod = valor auxiliar para calculo dos coeficientes
+		off = valor auxiliar de offset para calculo dos coeficientes
+		hcod_esc_y, hcod_esc_z = palavra de codigo a ser decodificada
+	*/
+		int swb, win, start_win_group, swb_width, bin, coef_index = 0;
 		int dim, index, lav, mod, off = 0;
 		int w,x,y,z;
 		bit[20:0] hcod_esc_y, hcod_esc_z;
@@ -393,10 +408,11 @@ class refmod_decodificadorAAC extends ovm_component;
 								if (z != 0 && spectral_data.quad_sign_bits[coef_index][0])
 									z = -z;								
 							end	
-							coefs[g][sfb][win][k++] = w;
-							coefs[g][sfb][win][k++] = x;
-							coefs[g][sfb][win][k++] = y;
-							coefs[g][sfb][win][k++] = z;
+							x_quant[g][sfb][win][bin++] = w;
+							x_quant[g][sfb][win][bin++] = x;
+							x_quant[g][sfb][win][bin++] = y;
+							x_quant[g][sfb][win][bin++] = z;
+							k += 4;
 						end
 						else if(dim == 2) begin
 							y = index/mod - off;
@@ -417,25 +433,26 @@ class refmod_decodificadorAAC extends ovm_component;
 								if(z == ESC_FLAG)
 									hcod_esc_z = spectral_data.hcod_esc_z[coef_index]; 
 							end							
-							coefs[g][sfb][win][k++] = y;
-							coefs[g][sfb][win][k++] = z;
+							x_quant[g][sfb][win][bin++] = y;
+							x_quant[g][sfb][win][bin++] = z;
+							k += 2;
 						end
 						
 						//verifica swb e janela
 						if (window_sequence == EIGHT_SHORT_SEQUENCE)	
-							swb_offset = get_swb_offset_short_window(swb);
+							swb_width = get_swb_offset_short_window(swb+1) - get_swb_offset_short_window(swb);
 						else
-							swb_offset = get_swb_offset_long_window(swb);
+							swb_width = get_swb_offset_long_window(swb+1) - get_swb_offset_long_window(swb);
 							
-						if (k == swb_offset) begin
-							//ja pegou todos os coeficientes de uma sfb, entao tem que passar para a proxima sfb da janela
-							swb++;							
-							if (swb > sect_end[g][i] ) begin
-								//chegou ao final das sfbs de uma janela, entao tem que passar para a proxima janela da secao
-								swb = sect_start[g][i];								
-								win ++;
-								k = sect_sfb_offset[g][sect_start[g][i]];
-								if ( win >  start_win_group + window_group_length[g] ) begin
+						if (bin >= swb_width) begin
+							//ja pegou todos os coeficientes de uma swb da janela, entao tem que passar para a swb da proxima janela do grupo
+							win++;
+							bin =0;
+							if ( win >  start_win_group + window_group_length[g] ) begin
+								//ja terminou as janelas do grupo, deve-se passar para a proxima swb da primeira janela do grupo
+								win = 0;
+								swb++;
+								if ( swb > sect_end[g][i] ) begin
 									//terminou a secao de um grupo
 									break;
 								end
@@ -474,7 +491,7 @@ class refmod_decodificadorAAC extends ovm_component;
         entrada_stim.get(tr_in_entrada);        
         tr_out_amostra= new();
 		tr_out_erro= new();
-		nChannels = 0;
+		//nChannels = 0;
         
         //-----------------------------------------------------------------------
         // Here goes the code that executes the reference model's functionality.
@@ -521,6 +538,8 @@ class refmod_decodificadorAAC extends ovm_component;
 								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO SCE!! : \n");
 								handle_ics(ics, 1'b0);
+								apply_quantizationToChannels();
+								apply_reescalerToChannels();
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
@@ -533,8 +552,13 @@ class refmod_decodificadorAAC extends ovm_component;
 								if(cpe.ms_mask_present == 1)
 									tr_out_erro.erro = 15;
 								handle_ics(cpe.ics1, cpe.common_window);
-								handle_ics(cpe.ics2, cpe.common_window);
+								apply_quantization();
+								apply_reescaler();
+								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 								
+								handle_ics(cpe.ics2, cpe.common_window);
+								apply_quantization();
+								apply_reescaler();								
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
@@ -586,7 +610,7 @@ class refmod_decodificadorAAC extends ovm_component;
       end //fim do while(1)
     endtask
 
-	task apply_quantizationToChannels();
+	task apply_quantization();
 		int width = 0;
 		$display("########### DEQUANTIZACAO ... ");
 		for(int g; g < num_window_groups ; g++)begin
@@ -594,6 +618,7 @@ class refmod_decodificadorAAC extends ovm_component;
 				width = (swb_offset[sfb+1] - swb_offset[sfb]);
 				for(int win = 0; win < window_group_length[g] ; win++)begin
 					for(int bin = 0; bin < width; bin++)begin
+					x_invquant[g][win][sfb][bin] = dequantizador.dequant(x_quant[g][win][sfb][bin]);
 							/*x_invquant[g][win][sfb][bin] = sign(x_quant[g][win][sfb][bin]) *
 abs(x_quant[g][win][sfb][bin])^(4/3);*/			
 					end
@@ -603,7 +628,7 @@ abs(x_quant[g][win][sfb][bin])^(4/3);*/
 		
 	endtask
 	
-	task apply_reescalerToChannels(ics_info ics_info);
+	task apply_reescaler();
 		int width = 0;
 		int index = 0;
 		$display("########### REESCALAMENTO ... ");
@@ -612,8 +637,9 @@ abs(x_quant[g][win][sfb][bin])^(4/3);*/
 				width = (swb_offset[sfb+1] - swb_offset[sfb]);
 				for(int win = 0; win < window_group_length[g] ; win++)begin
 					for(int k = 0; k < width; k++)begin
-							/*x_rescal[g][window][sfb][k] =
-x_invquant[g][window][sfb][k] * gain;*/			
+							x_rescal[g][win][sfb][k] = reescalador.reescala(sf[g][sfb] , x_invquant[g][window][sfb][k] );
+							/*x_rescal[g][win][sfb][k] =
+x_invquant[g][window][sfb][k] * gain;*/
 					end
 				end
 			end
