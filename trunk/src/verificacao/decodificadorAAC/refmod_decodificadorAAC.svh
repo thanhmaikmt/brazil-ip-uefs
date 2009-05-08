@@ -448,7 +448,7 @@ class refmod_decodificadorAAC extends ovm_component;
 							//ja pegou todos os coeficientes de uma swb da janela, entao tem que passar para a swb da proxima janela do grupo
 							win++;
 							bin =0;
-							if ( win >  start_win_group + window_group_length[g] ) begin
+							if ( win >=  start_win_group + window_group_length[g] ) begin
 								//ja terminou as janelas do grupo, deve-se passar para a proxima swb da primeira janela do grupo
 								win = 0;
 								swb++;
@@ -458,13 +458,12 @@ class refmod_decodificadorAAC extends ovm_component;
 								end
 							end
 						end
-					end
-				end
-			end		
+					end //end for  k
+				end //end if
+			end	//end for sect
 			//a cada novo grupo configura a janela como sendo a primeira janela do proximo grupo
-			start_win_group = start_win_group + window_group_length[g];
-			
-		end
+			start_win_group = start_win_group + window_group_length[g];			
+		end //end for group
 		
 		/*
 		if( nChannels%2 == 0)  begin			
@@ -538,8 +537,8 @@ class refmod_decodificadorAAC extends ovm_component;
 								ics = raw.sce[n_elements_in_raw].ics;
 								$display("\n######VEIO SCE!! : \n");
 								handle_ics(ics, 1'b0);
-								apply_quantizationToChannels();
-								apply_reescalerToChannels();
+								process_channel_coeficients();
+
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
@@ -552,13 +551,11 @@ class refmod_decodificadorAAC extends ovm_component;
 								if(cpe.ms_mask_present == 1)
 									tr_out_erro.erro = 15;
 								handle_ics(cpe.ics1, cpe.common_window);
-								apply_quantization();
-								apply_reescaler();
+								process_channel_coeficients();
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 								
 								handle_ics(cpe.ics2, cpe.common_window);
-								apply_quantization();
-								apply_reescaler();								
+								process_channel_coeficients();							
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
@@ -610,6 +607,11 @@ class refmod_decodificadorAAC extends ovm_component;
       end //fim do while(1)
     endtask
 
+	task process_channel_coeficients();
+		apply_quantization();
+		apply_reescaler();
+	endtask
+	
 	task apply_quantization();
 		int width = 0;
 		$display("########### DEQUANTIZACAO ... ");
