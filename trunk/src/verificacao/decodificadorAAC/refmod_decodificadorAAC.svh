@@ -1,6 +1,7 @@
 `include "AACHuffmanDecoder.svh"
 `include "reescalador.svh"
 `include "dequantizador.svh"
+`include "direct_imdct.sv"
 
 parameter ID_SCE = 0;
 parameter ID_CPE = 1;
@@ -52,6 +53,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	AACHuffmanDecoder huffmanDecoder;
 	reescalador reescalador = new();
 	dequantizador dequantizador = new();
+	direct_imdct imdct = new();
 	
 	int id_syn_ele, global_gain, num_window_groups, max_sfb;
 	bit[7:0] scale_factor_grouping;
@@ -65,6 +67,8 @@ class refmod_decodificadorAAC extends ovm_component;
 	int x_quant[7:0][48:0][7:0][1023:0]; // coeficientes do canal ainda quantizados
 	int x_invquant[7:0][48:0][7:0][1023:0]; // coeficientes do canal dequantizados e ainda nao reescalados
 	int x_rescal[7:0][48:0][7:0][1023:0]; // coeficientes do canal  dequantizados e reescalados
+	int coefs[1023:0]; // coeficientes do canal  dequantizados e reescalados
+	int coef_pcm[2047:0]; //amostras no dominio do tempo
 	//int coefsR[1023:0]; //coeficientes espectrais canal direito
 	//int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
 	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
@@ -98,7 +102,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	
 	task setHelpVariables( );
 		int num_windows, num_swb, sect_sfb, offset, width;
-		if (window_sequence == 2'b10) begin
+		if (window_sequence == EIGHT_SHORT_SEQUENCE) begin
 			//EIGHT_SHORT_SEQUENCE:
 			num_windows = 8;
 			num_window_groups = 1;
@@ -538,7 +542,6 @@ class refmod_decodificadorAAC extends ovm_component;
 								$display("\n######VEIO SCE!! : \n");
 								handle_ics(ics, 1'b0);
 								process_channel_coeficients();
-
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 							end
 							
@@ -555,8 +558,8 @@ class refmod_decodificadorAAC extends ovm_component;
 								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 								
 								handle_ics(cpe.ics2, cpe.common_window);
-								process_channel_coeficients();							
-								//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
+								process_channel_coeficients();								
+								
 							end
 							
 						ID_CCE : //ID_CCE
@@ -607,9 +610,15 @@ class refmod_decodificadorAAC extends ovm_component;
       end //fim do while(1)
     endtask
 
+	//TODO Dequantizar, Reescalar, IMDCT, JANELAMENTO, SOBREPOSICAO
 	task process_channel_coeficients();
+		int window_long = 1;
+		if(window_sequence == EIGHT_SHORT_SEQUENCE) //2'b10
+			window_long = 0;
+			
 		apply_quantization();
 		apply_reescaler();
+		imdct.tranformar(window_long, coefs, coef_pcm);
 	endtask
 	
 	task apply_quantization();
@@ -631,8 +640,7 @@ abs(x_quant[g][win][sfb][bin])^(4/3);*/
 	endtask
 	
 	task apply_reescaler();
-		int width = 0;
-		int index = 0;
+		int width, index = 0;
 		$display("########### REESCALAMENTO ... ");
 		for(int g; g < num_window_groups ; g++)begin
 			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
@@ -642,6 +650,8 @@ abs(x_quant[g][win][sfb][bin])^(4/3);*/
 							x_rescal[g][win][sfb][k] = reescalador.reescala(sf[g][sfb] , x_invquant[g][window][sfb][k] );
 							/*x_rescal[g][win][sfb][k] =
 x_invquant[g][window][sfb][k] * gain;*/
+							coefs[index] = reescalador.reescala(sf[g][sfb] , x_invquant[g][window][sfb][k] );
+							index++;
 					end
 				end
 			end
