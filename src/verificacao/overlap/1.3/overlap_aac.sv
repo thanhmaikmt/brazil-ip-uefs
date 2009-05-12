@@ -5,12 +5,13 @@ class overlap_aac;
 	endfunction
 	
 	function void overlap(int firstSequence, int pcm_in[3:0],  ref int pcm_out[3:0]);
-		foreach(pcm_out[i])
+		/*foreach(pcm_out[i])
 	     $display(pcm_out[i]);
+	  */
 	     
 		//////////////////////////EXECUTANDO/////////////////////////////////////
 
-		$display("Valor do firstSequence = %d", firstSequence);
+		//$display("Valor do firstSequence = %d", firstSequence);
 		
 		if(firstSequence == 1)
 				begin

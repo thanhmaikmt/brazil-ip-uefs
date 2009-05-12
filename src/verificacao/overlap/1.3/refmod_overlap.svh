@@ -37,31 +37,34 @@ class refmod_overlap extends ovm_component;
 			int pcm_in[3 : 0];
 			int pcm_out[3 : 0];
 			int firstSequence;
-
+      
+      
 			for(int i = 0; i < 4; i++)
 				begin
 					in_overlap_stim.get(tr_in_in_overlap);
 					pcm_in[i] = tr_in_in_overlap.pcmSample;
 				end
 			
+			firstSequence = tr_in_in_overlap.firstSequence;
+			
 			//in_overlap_stim.get(tr_in_in_overlap);
 			//firstSequence = tr_in_in_overlap.firstSequence;
 	
 			$display("\n");
 			$display(">refmod_overlap");
-			$display("firstSequence: %d", tr_in_in_overlap.firstSequence);
+			$display("firstSequence: %d", firstSequence);
 			$display("data in: %d, %d, %d, %d ", pcm_in[0], pcm_in[1], pcm_in[2], pcm_in[3]);
 			
 			
 			//chama a overlap_aac
 			tr_overlap_aac = new();
-			tr_overlap_aac.overlap(1, pcm_in, pcm_out);		
+			tr_overlap_aac.overlap(firstSequence, pcm_in, pcm_out);		
 			
 			
 			
 			$display("data out: %d, %d, %d, %d ", pcm_out[0], pcm_out[1], pcm_out[2], pcm_out[3]);
 			
-			/////
+			//seta saídas
 			for(int i = 0; i < 4; i++)
 				begin
 					tr_out_out_overlap = new();
