@@ -71,14 +71,14 @@ class refmod_decodificadorAAC extends ovm_component;
 	int coef_pcm[2047:0]; //amostras no dominio do tempo
 	//int coefsR[1023:0]; //coeficientes espectrais canal direito
 	//int coefsL[1023:0]; //coeficientes espectrais canal esquerdo
-	int nChannels = 0; //numero de canais individuais que já foram decodificados => numero par indica que o proximo canal é o esquerdo, numero impar indica que o proximo canal e o direito
+	int nChannels = 0; //numero de canais individuais que jï¿½ foram decodificados => numero par indica que o proximo canal ï¿½ o esquerdo, numero impar indica que o proximo canal e o direito
 	bit window_shape;
 	raw_data_block raw;
 	int n_elements_in_raw = 0;
 	individual_channel_stream ics;
 	channel_pair_element cpe;
-	int sect_start[7:0][48:0]; //sect_start[g][i] => indice da sfb que é o inicio da secao i de um grupo g
-	int sect_end[7:0][48:0]; //sect_end[g][i] => indice da sfb que é o final da secao i de um grupo g
+	int sect_start[7:0][48:0]; //sect_start[g][i] => indice da sfb que ï¿½ o inicio da secao i de um grupo g
+	int sect_end[7:0][48:0]; //sect_end[g][i] => indice da sfb que ï¿½ o final da secao i de um grupo g
 	int num_sec[7:0]; //num_sec[g] => numero de secoes do grupo g
 	
 	task handle_ics_info(ics_info ics_info);
@@ -110,7 +110,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			num_swb = 14;
 			for (int i = 0; i < num_swb + 1; i++)
 				swb_offset[i] = get_swb_offset_short_window(i);
-			/*preparação do número de grupos e do tamanho de cada grupo*/
+			/*preparaï¿½ï¿½o do nï¿½mero de grupos e do tamanho de cada grupo*/
 			for (int i = 0; i < num_windows-1; i++) begin
 				if(scale_factor_grouping[6-i] == 1'b0) begin
 					num_window_groups += 1;
@@ -120,7 +120,7 @@ class refmod_decodificadorAAC extends ovm_component;
 					window_group_length[num_window_groups-1] += 1;
 				end
 			end
-			/* preparação do sect_sfb_offset para janelas curtas */
+			/* preparaï¿½ï¿½o do sect_sfb_offset para janelas curtas */
 			for (int g = 0; g < num_window_groups; g++) begin
 				sect_sfb = 0;
 				offset = 0;
@@ -130,7 +130,7 @@ class refmod_decodificadorAAC extends ovm_component;
 					sect_sfb_offset[g][sect_sfb++] = offset;
 					offset += width;
 				end
-				//sect_sfb_offset[g][sect_sfb] = offset; //FIXME banda 14 não existe!!
+				//sect_sfb_offset[g][sect_sfb] = offset; //FIXME banda 14 nï¿½o existe!!
 			end
 		end	
 		else begin
@@ -141,7 +141,7 @@ class refmod_decodificadorAAC extends ovm_component;
 			num_window_groups = 1;
 			window_group_length[num_window_groups-1] = 1;
 			num_swb = 49;
-			/* preparação do sect_sfb_offset para janelas longas */
+			/* preparaï¿½ï¿½o do sect_sfb_offset para janelas longas */
 			
 			for (int i = 0; i < max_sfb + 1; i++) begin
 				sect_sfb_offset[0][i] = get_swb_offset_long_window(i);
@@ -264,7 +264,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	endtask
 	
 	task handle_section_data(section_data sd);		
-		//processa as informações relativas ao secionamento dos grupos
+		//processa as informaï¿½ï¿½es relativas ao secionamento dos grupos
 		int k, i, sect_len, sect_len_incr, sect_esc_val, j;
 		$display("#### SECTION_DATA ..");
 		if(window_sequence == EIGHT_SHORT_SEQUENCE) //EIGHT_SHORT_SEQUENCE
@@ -302,7 +302,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	endtask
 	
 	task handle_scale_factor_data(scale_factor_data sfd);	
-	//processa as informações relativas aos fatores de escala
+	//processa as informaï¿½ï¿½es relativas aos fatores de escala
 		int dpcmSF = 0;   
 		int lastSF = global_gain;
 		$display("##### SCALE_FACTOR_DATA ... " );
@@ -313,7 +313,7 @@ class refmod_decodificadorAAC extends ovm_component;
 						tr_out_erro.erro = 15;
 					end
 					else begin
-					//decodifica os fatores de escala de tamanho variável e calcula o valor diferencial
+					//decodifica os fatores de escala de tamanho variï¿½vel e calcula o valor diferencial
 						huffmanDecoder = new(12); //12 indica para usar o livro de codigo dos fatores de escala
 						dpcmSF = huffmanDecoder.decode(sfd.hcod_sf[g][sfb]);				
 						sf[g][sfb] = lastSF + dpcmSF;
@@ -350,7 +350,7 @@ class refmod_decodificadorAAC extends ovm_component;
 		bit[20:0] hcod_esc_y, hcod_esc_z;
 		$display("##### SPECTRAL_FACTOR_DATA ... " );
 	
-		//processa as informações relativas aos coeficientes espectrais		
+		//processa as informaï¿½ï¿½es relativas aos coeficientes espectrais		
 		for(int g=0; g< num_window_groups; g++) begin			
 			//$display("## num_window_groups= %d | num_sec[0] = %d | " , num_window_groups,  num_sec[0] );
 			for(int i=0; i< num_sec[g]; i++) begin					
@@ -361,11 +361,11 @@ class refmod_decodificadorAAC extends ovm_component;
 					swb	= sect_start[g][i];		
 					for(int k=sect_sfb_offset[g][sect_start[g][i]] ; k< sect_sfb_offset[g][sect_end[g][i]];) begin								
 						if(sect_codebook[g][i] <= FIRST_PAIR_HCB) begin 
-						/*livros de código para quadruplas de coeficientes*/
+						/*livros de cï¿½digo para quadruplas de coeficientes*/
 							dim = 4;
 						end
 						else begin 
-						/*livros de código para pares de coeficientes*/
+						/*livros de cï¿½digo para pares de coeficientes*/
 							dim = 2;
 						end
 						/*configura o maior valor absoluto para cada livro de codigo*/
@@ -412,10 +412,10 @@ class refmod_decodificadorAAC extends ovm_component;
 								if (z != 0 && spectral_data.quad_sign_bits[coef_index][0])
 									z = -z;								
 							end	
-							x_quant[g][sfb][win][bin++] = w;
-							x_quant[g][sfb][win][bin++] = x;
-							x_quant[g][sfb][win][bin++] = y;
-							x_quant[g][sfb][win][bin++] = z;
+							x_quant[g][swb][win][bin++] = w;
+							x_quant[g][swb][win][bin++] = x;
+							x_quant[g][swb][win][bin++] = y;
+							x_quant[g][swb][win][bin++] = z;
 							k += 4;
 						end
 						else if(dim == 2) begin
@@ -437,8 +437,8 @@ class refmod_decodificadorAAC extends ovm_component;
 								if(z == ESC_FLAG)
 									hcod_esc_z = spectral_data.hcod_esc_z[coef_index]; 
 							end							
-							x_quant[g][sfb][win][bin++] = y;
-							x_quant[g][sfb][win][bin++] = z;
+							x_quant[g][swb][win][bin++] = y;
+							x_quant[g][swb][win][bin++] = z;
 							k += 2;
 						end
 						
@@ -501,9 +501,9 @@ class refmod_decodificadorAAC extends ovm_component;
         //-----------------------------------------------------------------------
 		$display("\n###### STREAM RECEBIDA PELO REFMOD : \n%s", tr_in_entrada.psprint());	
 		
-		//VERIFICA ALGUMAS CONFIGURAÇÕES DO CABEÇALHO
+		//VERIFICA ALGUMAS CONFIGURAï¿½ï¿½ES DO CABEï¿½ALHO
 		if(tr_in_entrada.adif_id != 32'h41444946) begin
-			//$display("\n######ERRO: NÂO VEIO ADIF_ID!! : \n");
+			//$display("\n######ERRO: Nï¿½O VEIO ADIF_ID!! : \n");
 			tr_out_erro.erro = 1;
 			
 		end
@@ -618,13 +618,14 @@ class refmod_decodificadorAAC extends ovm_component;
 			
 		apply_quantization();
 		apply_reescaler();
-		imdct.tranformar(window_long, coefs, coef_pcm);
+		//imdct.transformar(window_long, coefs, coef_pcm);
+
 	endtask
 	
 	task apply_quantization();
 		int width = 0;
 		$display("########### DEQUANTIZACAO ... ");
-		for(int g; g < num_window_groups ; g++)begin
+		for(int g=0; g < num_window_groups ; g++)begin
 			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
 				width = (swb_offset[sfb+1] - swb_offset[sfb]);
 				for(int win = 0; win < window_group_length[g] ; win++)begin
@@ -642,15 +643,14 @@ abs(x_quant[g][win][sfb][bin])^(4/3);*/
 	task apply_reescaler();
 		int width, index = 0;
 		$display("########### REESCALAMENTO ... ");
-		for(int g; g < num_window_groups ; g++)begin
+		for(int g=0; g < num_window_groups ; g++)begin
 			for(int sfb = 0; sfb < max_sfb ; sfb++)begin
 				width = (swb_offset[sfb+1] - swb_offset[sfb]);
 				for(int win = 0; win < window_group_length[g] ; win++)begin
 					for(int k = 0; k < width; k++)begin
-							x_rescal[g][win][sfb][k] = reescalador.reescala(sf[g][sfb] , x_invquant[g][window][sfb][k] );
-							/*x_rescal[g][win][sfb][k] =
-x_invquant[g][window][sfb][k] * gain;*/
-							coefs[index] = reescalador.reescala(sf[g][sfb] , x_invquant[g][window][sfb][k] );
+							//x_rescal[g][win][sfb][k] = reescalador.reescala(sf[g][sfb] , x_invquant[g][win][sfb][k] );
+							//x_rescal[g][win][sfb][k] = x_invquant[g][window][sfb][k] * gain;
+							coefs[index] = reescalador.reescala(sf[g][sfb] , x_invquant[g][win][sfb][k] );
 							index++;
 					end
 				end

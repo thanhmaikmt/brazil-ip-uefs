@@ -7,8 +7,7 @@ class data_stream_element extends syntatic_element;
 	rand byte count;
 	rand byte esc_count;
 	
-	//maximo de 512 bytes de dados
-	rand byte data_stream_byte[511:0];
+
 
 	//if (cnt == 255) {
 	//cnt += esc_count; 8 uimsbf
@@ -17,7 +16,7 @@ class data_stream_element extends syntatic_element;
 	//byte_alignment();
 	//}
 	//for (i = 0; i < cnt; i++) {
-	//ate 510 bytes de dados para cada instancia de data_stream_element (podem haver até 16 instancias)
+	//ate 510 bytes de dados para cada instancia de data_stream_element (podem haver atï¿½ 16 instancias)
 	rand byte data_stream_byte[15:0][509:0]; //8 uimsbf
 	//}
 	

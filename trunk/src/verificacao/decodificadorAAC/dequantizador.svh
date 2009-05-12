@@ -1,4 +1,4 @@
-import "DPI_C" function real dequantiza(int idx);
+import "DPI-C" function real dequantiza(int idx);
 `include "ovm.svh"
 
 class dequantizador extends ovm_object;
