@@ -41,11 +41,11 @@ double reesc(unsigned char idx){
 
   
 }
-
-
+/*
 int main(int argc, char *argv[]){
       unsigned char sf=atoi(argv[1]);
       printf("sf=%d,gain=%.16f\n",sf,reesc(sf));
       exit(0);
 }
  
+*/

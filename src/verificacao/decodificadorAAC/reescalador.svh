@@ -1,5 +1,4 @@
-
-				  //scalefactor, coeficiente	  
+//scalefactor, coeficiente	  
 import "DPI-C" function real reesc(byte idx, int coef);
 `include "ovm.svh"
 
