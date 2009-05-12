@@ -5,7 +5,7 @@
     ovm_get_port #(overlap_output) out_overlap_from_duv;
     overlap_output p_out_overlap;
      
-    int fiber_pcmSample;
+    int fiber_pcmSample2;
     
 
     function new(string name, ovm_component parent);
@@ -13,7 +13,7 @@
 
       out_overlap_from_duv = new("out_overlap_from_duv", this);
        
-      fiber_pcmSample = $sdi_create_fiber("DriverDUV", "TVM", "top");
+      fiber_pcmSample2 = $sdi_create_fiber("DriverDUV", "TVM", "top");
       
     endfunction
 
@@ -25,7 +25,7 @@
       while(reset) @(posedge clk);
       while(1) begin
         out_overlap_from_duv.get(p_out_overlap);
-        p_out_overlap.rec_begin(fiber_pcmSample,"out_overlap"); 
+        p_out_overlap.rec_begin(fiber_pcmSample2,"out_overlap"); 
         out_overlap_pcmSample  <= p_out_overlap.pcmSample;
         out_overlap_valid  <= 1;
         @(posedge clk);
