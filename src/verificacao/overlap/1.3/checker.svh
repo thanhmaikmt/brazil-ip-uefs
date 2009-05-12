@@ -26,16 +26,16 @@ class checker extends ovm_threaded_component;
         out_overlap_from_duv.get(tr_duv_out_overlap);
         out_overlap_from_refmod.get(tr_modref_out_overlap);
         if(!tr_duv_out_overlap.equal(tr_modref_out_overlap))
-			begin
-				msg = $psprintf("received:  %s  expected  %s", 
-					tr_duv_out_overlap.psprint(), tr_modref_out_overlap.psprint() );
-				ovm_report_error("checker", msg);
-				record_error(fiber, msg);
-			end
-		else
-			begin
-				msg = $psprintf("received expected value");
-			end
+			     begin
+				    msg = $psprintf("received:  %s  expected  %s", 
+        				tr_duv_out_overlap.psprint(), tr_modref_out_overlap.psprint() );
+				    ovm_report_error("checker", msg);
+            record_error(fiber, msg);
+        			end
+		    else
+			     begin
+				    msg = $psprintf("received expected value");
+			     end
       end
     endtask
 endclass
