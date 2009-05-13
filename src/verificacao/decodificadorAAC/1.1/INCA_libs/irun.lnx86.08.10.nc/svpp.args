@@ -1,0 +1,11 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+./tb.sv
+-outdir
+./INCA_libs/irun.lnx86.08.10.nc
+-l
+svpp.log
+-incdir
+/usr/local/cds/ovm-2.0/src
