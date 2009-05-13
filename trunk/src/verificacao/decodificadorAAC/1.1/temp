@@ -1,0 +1,53 @@
+//processa as informações relativas aos coeficientes espectrais		
+		for(int g=0; g< num_window_groups; g++) begin			
+			//$display("## num_window_groups= %d | num_sec[0] = %d | " , num_window_groups,  num_sec[0] );
+			for(int i=0; i< num_sec[g]; i++) begin					
+				win = start_win_group;
+			//	$display("## num_window_groups= %d | num_sec[%d] = %d | sect_sfb_offset[start]=  | sect_sfb_offset[end]= " , num_window_groups, g,  num_sec[g] );
+				if(sect_codebook[g][i] != ZERO_HCB && sect_codebook[g][i] <= ESC_HCB) begin //11= ESC_HCB
+					huffmanDecoder = new(sect_codebook[g][i]);
+					swb	= sect_start[g][i];	
+					for(int k=sect_sfb_offset[g][sect_start[g][i]] ; k< sect_sfb_offset[g][sect_end[g][i]];) begin								
+						
+						if(huffmanDecoder.is_unsigned_codebook(sect_codebook[g][i])) begin
+							mod = lav + 1;
+							off = 0;								
+						end
+						else begin
+							mod = 2*lav + 1;
+							off = lav;
+						end
+						index = huffmanDecoder.decode(spectral_data.hcod[coef_index]);
+						//$display("## INDEX = %d" , index);
+
+							k += 2;
+						
+						int swb_offset = 0;
+						if (window_sequence == EIGHT_SHORT_SEQUENCE)	
+							swb_offset = get_swb_offset_short_window(swb);
+						else
+							swb_offset = get_swb_offset_long_window(swb);
+							
+						if (k == swb_offset) begin
+							//ja pegou todos os coeficientes de uma sfb, entao tem que passar para a proxima sfb da janela
+							swb++;							
+							if (swb > sect_end[g][i] ) begin
+								//chegou ao final das sfbs de uma janela, entao tem que passar para a proxima janela da secao
+								swb = sect_start[g][i];								
+								win ++;
+								k = sect_sfb_offset[g][sect_start[g][i]];
+								if ( win >  start_win_group + window_group_length[g] ) begin
+									//terminou a secao de um grupo
+									break;
+								end
+							end
+						end
+						
+					end
+				end
+			end		
+			//a cada novo grupo configura a janela como sendo a primeira janela do proximo grupo
+			start_win_group = start_win_group + window_group_length[g];
+			
+		end
+		

@@ -1,0 +1,16 @@
+//
+// File created by:  irun
+// Do not modify this file
+//
+-ovmhome
+/usr/local/cds/ovm-2.0
+-input
+tb.tcl
+-access
++r
+-coverage
+functional
+tb.sv
+gain.c
+dequantizador.c
+libs_C.c

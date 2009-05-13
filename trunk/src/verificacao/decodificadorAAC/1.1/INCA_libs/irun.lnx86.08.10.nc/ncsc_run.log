@@ -1,0 +1,31 @@
+$CDSROOT = /usr/local/cds/ius81
+$TESTDIR = /home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC
+
+TOOL:	ncsc	08.10-s008
+ncsc cc parameters: 
+	$CDSROOT/tools/systemc/gcc/4.1/bin/gcc
+	-I$CDSROOT/tools/include
+	-I$CDSROOT/tools/inca/include-DNCSC
+	-c
+	-x c  -Wall 
+
+make[1]: Entrando no diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+ncsc: compiling $TESTDIR/gain.c
+
+make[1]: Saindo do diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+$TESTDIR/gain.c:51:3: warning: no newline at end of file
+
+make[1]: Entrando no diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+ncsc: compiling $TESTDIR/dequantizador.c
+
+make[1]: Saindo do diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+$TESTDIR/dequantizador.c:79:3: warning: no newline at end of file
+
+make[1]: Entrando no diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+ncsc: compiling $TESTDIR/libs_C.c
+
+make[1]: Saindo do diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+
+make[1]: Entrando no diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
+building library run.so
+make[1]: Saindo do diretório `/home/usuario/Desktop/brazil-ip-uefs/src/verificacao/decodificadorAAC'
