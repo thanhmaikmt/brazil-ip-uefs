@@ -1,33 +1,52 @@
 class overlap_aac;
- 
- 
+  
+  //tamanho de cada metade
+  parameter int HALF_WINDOW_SIZE = 2;
+  
+  typedef enum { middle = 0, first = 1, last = 2} SequencePosition;
+  SequencePosition position;
+  
 	function new();
+	  position = middle;
 	endfunction
 	
-	function void overlap(int firstSequence, int pcm_in[3:0],  ref int pcm_out[3:0]);
-		/*foreach(pcm_out[i])
-	     $display(pcm_out[i]);
-	  */
-	     
-		//////////////////////////EXECUTANDO/////////////////////////////////////
-
-		//$display("Valor do firstSequence = %d", firstSequence);
+	/*
+	* int sequencePos - definido de acordo ao enum SequencePosition
+	* pcm_in_1 - ultima metade da primeira seqüência
+	* pcm_in_2 - primeira metada da segunda seqüência
+	* pcm_out - saída
+	*/
+	function void overlap(int sequencePos, int pcm_in_1[(HALF_WINDOW_SIZE-1):0], int pcm_in_2[(HALF_WINDOW_SIZE-1):0],  ref int pcm_out[(HALF_WINDOW_SIZE-1):0]);
+		int i = 0;
 		
-		if(firstSequence == 1)
+		position = SequencePosition'(sequencePos);
+				
+		if(position == first)
 				begin
-					pcm_out[0] = pcm_in[0];
+				  for(i = 0; i < HALF_WINDOW_SIZE; i++) begin
+					   pcm_out[i] = pcm_in_2[i];
+					end
+					/*
+					pcm_out[0] = pcm_in[0]
 					pcm_out[1] = pcm_in[1];
 					pcm_out[2] = pcm_in[2];
-					pcm_out[3] = pcm_in[3];
+					pcm_out[3] = pcm_in[3];*/
 				end
-			else
+			else if (position == last)
 				begin
-					pcm_out[0] = pcm_in[0] + pcm_in[2];
-					pcm_out[1] = pcm_in[1] + pcm_in[3];
-					pcm_out[2] = 0;
-					pcm_out[3] = 0; 
+				  
+					for(i = 0; i < HALF_WINDOW_SIZE; i++) begin
+					   pcm_out[i] = pcm_in_1[i];
+					end
+					
 				end
-			
+      else //middle
+			  begin
+				  for(i = 0; i < HALF_WINDOW_SIZE; i++) begin
+					   pcm_out[i] = pcm_in_1[i] + pcm_in_2[i];
+					end
+					
+				end
 			
 			//return
 			//overlap = coef_pcm_out;

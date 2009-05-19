@@ -34,15 +34,22 @@ class refmod_overlap extends ovm_component;
    task run();
 		while(1) begin
 			
-			int pcm_in[3 : 0];
-			int pcm_out[3 : 0];
+			int pcm_in_1[1 : 0];
+			int pcm_in_2[1 : 0];
+			int pcm_out[1 : 0];
 			int firstSequence;
       
       
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i < 2; i++)
 				begin
 					in_overlap_stim.get(tr_in_in_overlap);
-					pcm_in[i] = tr_in_in_overlap.pcmSample;
+					pcm_in_1[i] = tr_in_in_overlap.pcmSample;
+				end
+				
+			for(int i = 0; i < 2; i++)
+				begin
+					in_overlap_stim.get(tr_in_in_overlap);
+					pcm_in_2[i] = tr_in_in_overlap.pcmSample;
 				end
 			
 			firstSequence = tr_in_in_overlap.firstSequence;
@@ -53,12 +60,12 @@ class refmod_overlap extends ovm_component;
 			$display("\n");
 			$display(">refmod_overlap");
 			$display("firstSequence: %d", firstSequence);
-			$display("data in: %d, %d, %d, %d ", pcm_in[0], pcm_in[1], pcm_in[2], pcm_in[3]);
+			$display("data in: %d, %d, %d, %d ", pcm_in_1[0], pcm_in_1[1], pcm_in_2[0], pcm_in_2[1]);
 			
 			
 			//chama a overlap_aac
 			tr_overlap_aac = new();
-			tr_overlap_aac.overlap(firstSequence, pcm_in, pcm_out);		
+			tr_overlap_aac.overlap(firstSequence, pcm_in_1, pcm_in_2, pcm_out);		
 			
 			
 			
