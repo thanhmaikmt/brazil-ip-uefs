@@ -2,6 +2,7 @@
 `include "reescalador.svh"
 `include "dequantizador.svh"
 `include "direct_imdct.sv"
+`include "overlap_aac.sv"
 
 parameter ID_SCE = 0;
 parameter ID_CPE = 1;
@@ -54,6 +55,7 @@ class refmod_decodificadorAAC extends ovm_component;
 	reescalador reescalador = new();
 	dequantizador dequantizador = new();
 	direct_imdct imdct = new();
+	overlap_aac overlap = new();
 	
 	int id_syn_ele, global_gain, num_window_groups, max_sfb;
 	bit[7:0] scale_factor_grouping;
@@ -619,6 +621,8 @@ class refmod_decodificadorAAC extends ovm_component;
 		apply_quantization();
 		apply_reescaler();
 		//imdct.transformar(window_long, coefs, coef_pcm);
+		//wbs
+		//overlap.overlap();
 
 	endtask
 	
