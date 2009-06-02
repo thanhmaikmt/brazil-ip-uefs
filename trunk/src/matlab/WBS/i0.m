@@ -1,4 +1,18 @@
-function [ i0_result ] = i0( x, kMax )
+function [ i0_result ] = i0( x )
+    
+    global kMax;
+    if(~exist('kMax'))
+        kMax = [];
+    end;
+    
+
+    if(isempty(kMax)),
+        fprintf ('\n Digite o k máximo: \n');
+            kMax = input('--> ');
+    end;
+    
+
+    
     
     k = [0:1:kMax];
     
@@ -7,7 +21,7 @@ function [ i0_result ] = i0( x, kMax )
     
     acumulador = 0;
     for i = 1:kMax+1,
-        fprintf ('k %d - result %d\n', i0_result(1, i), i0_result(2, i));
+        %fprintf ('k %d - result %d\n', k(i), i0_result(2, i));
         
         acumulador = acumulador + i0_result(2, i);
         i0_result(3, i) = acumulador;
