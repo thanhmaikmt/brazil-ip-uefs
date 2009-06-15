@@ -25,12 +25,12 @@ function [ output_args ] = mainI0 (x, kMax_in)
 
     i0_result = i0(x);
 
-    result_max = 1;
-    result_min = i0_result(2, kMax)
+    %result_max = 1;
+    %result_min = i0_result(2, kMax)
 
-    y = (result_min/result_max)^(0.5)
+    %y = (result_min/result_max)^(0.5)
 
-    eixos = [0 kMax 0 y];
+    %eixos = [0 kMax 0 y];
 
     figure;
     subplot(2,1,1);
@@ -65,11 +65,11 @@ function [ output_args ] = mainI0 (x, kMax_in)
     xMin = -x
     xMax = x
 
-    x = linspace(xMin, xMax, 10);
+    x_ = linspace(xMin, xMax, 10);
     r = [];
 
     for(i = 1:10),
-        i0_result = i0(x(i));
+        i0_result = i0(x_(i));
         r(i,:) = i0_result(3,:);
     end;
 
@@ -83,7 +83,7 @@ function [ output_args ] = mainI0 (x, kMax_in)
 
 
     figure;
-    mesh (k, x, r);
+    mesh (k, x_, r);
         title('i0(x)');
         xlabel('k');
         ylabel('x');
@@ -104,3 +104,46 @@ function [ output_args ] = mainI0 (x, kMax_in)
     %        axis(eixos);
     %    end;
 
+    %figure;
+    %eixos = [-10 10 0 30];
+    %i0_result(2,:)
+    %hist(i0_result(2,:) );
+        %title('histograma');
+        %xlabel('k');
+        %ylabel('x');
+        %if(~isempty(eixos))
+        %    axis(eixos);
+        %end;
+
+        
+        
+%---------------------------------------------------------------------------------------------------------        
+   i = 50;
+
+   for i = 1: abs(x)+1,
+       kMin = floor((x - i)/2);
+       
+       if kMin < 0,
+           kMin = 0;
+       end;
+       
+       kMax = kMin + i - 1;
+       k = [kMin : kMax]
+       
+       rs = funcao(x, k);
+       i0_(i) = sum(rs(:))
+   end;
+   
+   k = [0 : 3*x];
+   rs = funcao(x, k);
+   i0_ideal = sum(rs(:));
+   
+   figure;
+   string = sprintf('exatidão i0(%d)', x)
+   plot(100 * i0_./i0_ideal);
+        title(string);
+        xlabel('passos');
+        ylabel('percentual');
+        grid;
+
+   
