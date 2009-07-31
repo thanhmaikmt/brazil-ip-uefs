@@ -30,14 +30,14 @@ use IEEE.std_logic_arith.all; 		-- Para std_logic
 use IEEE.Std_Logic_unsigned.all;   	-- Para conv_integer
 
 
-entity OVERLAP is
+entity OVERLAP2 is
 port(
      sequencePos	: in std_logic_vector(1 downto 0);
 	 pcm_in_1, pcm_in_2	: in std_logic_vector(31 downto 0); --duas palavras de 16 bits
 	 --Res 	: buffer std_logic_vector(15 downto 0);
      pcm_out	: buffer std_logic_vector(31 downto 0)
      );
-end OVERLAP;
+end OVERLAP2;
 
 architecture comportamento of OVERLAP is
 begin
@@ -67,7 +67,7 @@ begin
 					-- pcm_out[i] = pcm_in_1[i];		    
 
       
-	  when others => pcm_out <= 0;
+	  when others => pcm_out <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
     end case;
 	
 	pcm_out(15 downto  0) <= conv_std_logic_vector(result_0, 16);

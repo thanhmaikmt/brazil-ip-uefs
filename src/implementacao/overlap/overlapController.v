@@ -38,19 +38,22 @@ module overlapController(clk, sequencePos, pcm_in_1, pcm_in_2, pcm_out);
 	integer i;
 	integer msb, lsb;
 	
+	reg [ 2* wordLength - 1:0] in_1;
+	reg [ 2* wordLength - 1:0] in_2;
+	
 	overlap over(sequencePos, in_1, in_2, out);
 	
 	always @(posedge clk )
 	begin
  
-		for(i = 0; i < halfWindowSize; i = i + 1)
+		for(i = 0; i < halfWindowSize; i = i + 2)
 		begin
-			msb <= ((i + 1) * wordLength - 1);
+			msb <= ((2 * i + 1) * wordLength - 1);
 			lsb <= (i * wordLength);
 			
 			in_1 <= pcm_in_1[msb:lsb];
 			in_2 <= pcm_in_2[msb:lsb];
-			out <= pcm_out[msb:lsb];
+			pcm_out[msb:lsb] <= out;
 			
 		end
 
