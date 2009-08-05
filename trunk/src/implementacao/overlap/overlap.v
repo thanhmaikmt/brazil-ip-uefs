@@ -39,8 +39,6 @@ module overlap(sequencePos, pcm_in_1, pcm_in_2, pcm_out);
 
 	reg [((2 * wordLength) - 1):0] pcm_out;
 	
-	integer i;
-	
 	
 	always
 	begin
