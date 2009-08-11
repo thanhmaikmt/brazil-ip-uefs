@@ -15,11 +15,12 @@ module memory(clk, save, read, in0, in1, out);
 	reg [wordLength - 1 : 0] mem0 [1023 : 0];
 	reg [wordLength - 1 : 0] mem1 [1023 : 0];
 	
+	
+	
 	always @(posedge clk )
 	begin 
 		
-		if(save)
-		begin
+		if(save) begin
 			mem0 <= in0;
 			mem1 <= in1;
 		end

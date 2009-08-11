@@ -31,8 +31,8 @@ module overlap(sequencePos, pcm_in_1, pcm_in_2, pcm_out);
 	parameter wordLength = 16;
 	
 	
-	input [((2 * wordLength) - 1):0] pcm_in_1; //sem sinal
-	input [((2 * wordLength) - 1):0] pcm_in_2; //sem sinal
+	input [((2 * wordLength) - 1):0] pcm_in_1; //sem ponto flutuante
+	input [((2 * wordLength) - 1):0] pcm_in_2; //sem ponto flutuante
 	input [1:0]sequencePos;
 	
 	output [((2 * wordLength) - 1):0] pcm_out;
