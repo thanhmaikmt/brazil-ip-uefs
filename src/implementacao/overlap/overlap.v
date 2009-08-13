@@ -18,7 +18,6 @@
 *						ref int pcm_out[(HALF_WINDOW_SIZE-1):0]);
 *
 *
-* int sequencePos - definido de acordo ao enum SequencePosition { middle = 0, first = 1, last = 2}
 * pcm_in_1 - ultima metade da primeira seqüência
 * pcm_in_2 - primeira metada da segunda seqüência
 * pcm_out - saída
@@ -26,52 +25,84 @@
 
 
 
-module overlap(sequencePos, pcm_in_1, pcm_in_2, pcm_out);
+module overlap(clock, reset, load, action, dataBus);
 	
 	parameter wordLength = 16;
 	
+	parameter busSize = 4 * wordLength;
 	
-	input [((2 * wordLength) - 1):0] pcm_in_1; //sem ponto flutuante
-	input [((2 * wordLength) - 1):0] pcm_in_2; //sem ponto flutuante
-	input [1:0]sequencePos;
+	input clock, reset, load, action;
 	
-	output [((2 * wordLength) - 1):0] pcm_out;
+	inout [(busSize - 1):0] dataBus; //sem ponto flutuante
+	
+	//output [(busSize - 1):0] dataBusOut;
+	
+	wire [(busSize - 1):0] dataBus;
+	
+	reg [(busSize - 1):0] dataBusOut;
+	
+	reg [(wordLength - 1):0] pcm1 [3:0];
+	reg [(wordLength - 1):0] pcm2 [3:0];
+	
 
-	reg [((2 * wordLength) - 1):0] pcm_out;
+	integer i;
+	integer loadedFirst; //deveria ser algum booleano
 	
+	assign dataBus = action ? dataBusOut : 64'bz;
 	
-	always
+	always @(posedge clock or posedge reset)
 	begin
-		case (sequencePos)
-			2'b00:
-			begin
-				pcm_out[wordLength-1:0] <= pcm_in_1[wordLength-1:0] + pcm_in_2[wordLength-1:0];
-				pcm_out[(2 * wordLength) - 1:wordLength] <= pcm_in_1[(2 * wordLength) - 1:wordLength] + pcm_in_2[(2 * wordLength) - 1:wordLength];
+		if(reset) begin
+			for(i = 0; i < 4; i = i + 1) begin
+				pcm1[i] <= 16'b0000000000000000;
+				pcm2[i] <= 16'b0000000000000000;
 			end
 			
-			2'b01:
-			begin
-				pcm_out <= pcm_in_2;
-			end
-				
-			2'b10:
-			begin
-				pcm_out <= pcm_in_1;
-			end
+			loadedFirst <= 0;
 			
-			/*default:
-			begin
-				/*for (i = 0;i < 2 * wordLength;i = i + 1)
-				begin
-					pcm_out[i] = 1b'x;
-				end* /
+		end
+		else begin
+			if(load) begin
+				//primeiros valores foram carregados
+				if(loadedFirst == 0) begin
 				
-				pcm_out = 32b'z;
+					pcm1[0] <= dataBus[((0+1) * wordLength) - 1: 0 * wordLength];
+					pcm1[1] <= dataBus[((1+1) * wordLength) - 1: 1 * wordLength];
+					pcm1[2] <= dataBus[((2+1) * wordLength) - 1: 2 * wordLength];
+					pcm1[3] <= dataBus[((3+1) * wordLength) - 1: 3 * wordLength];
+					/*for(i = 0; i < 4; i = i + 1) begin
+						pcm1[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
+						pcm2[i] <= 16'b0000000000000000;
+					end*/
+					
+					loadedFirst <= 1;
+				end
+				else begin
+					/*for(i = 0; i < 4; i = i + 1) begin
+						pcm2[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
+					end*/
+					pcm2[0] <= dataBus[((0+1) * wordLength) - 1: 0 * wordLength];
+					pcm2[1] <= dataBus[((1+1) * wordLength) - 1: 1 * wordLength];
+					pcm2[2] <= dataBus[((2+1) * wordLength) - 1: 2 * wordLength];
+					pcm2[3] <= dataBus[((3+1) * wordLength) - 1: 3 * wordLength];
+					
+					loadedFirst <= 0;
+				end
+			end
+			/*else if(action) begin
+				/ *for(i = 0; i < 4; i = i + 1) begin
+					dataBusOut[((i+1) * wordLength) - 1: i * wordLength] <= pcm1[i] + pcm2[i];
+				end * /
+				
+				//dataBus <= dataBusOut;
 			end*/
-			  
-			  
-		endcase
-
+			
+			dataBusOut[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
+			dataBusOut[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
+			dataBusOut[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
+			dataBusOut[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
+		end
+		
 	end
 	
 endmodule

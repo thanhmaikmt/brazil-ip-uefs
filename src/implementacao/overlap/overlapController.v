@@ -14,23 +14,30 @@
 * int sequencePos - definido de acordo ao enum SequencePosition { middle = 0, first = 1, last = 2}
 -------------------------------------------------------------------------------*/
 
-module overlapController(clk);
+module overlapController(enable, rst, firstAddress, secondAddress);
 	
 	parameter windowSize = 1024;
 	parameter halfWindowSize = 512;
 	parameter wordLength = 16;
 	
-	input clk, rst;
+	parameter adressBase = 0;
 	
-	output [((2 * wordLength) - 1):0] pcm_0;
-	output [((2 * wordLength) - 1):0] pcm_1;
-	output [1:0]sequencePos;
-	
-	unsigned integer secondSequenceIndex;
-	unsigned integer wordIndex;
+	input rst, enable;
+		
+	output [15:0] firstAddress;
+	output [15:0] secondAddress;
 	
 	
-	always @(posedge clk or rst)
+	reg    [15:0] firstAddress;
+	reg    [15:0] secondAddress;
+	
+	// números irão depender da memória compartilhada entre o overlapping e window switching
+	// para secondSequenceIndex de 2 bits são compartilhadas 4 Kb de memória
+	integer secondSequenceIndex;
+	integer wordIndex;
+	
+	
+	always @(enable or rst)
 	begin
 	
 		if(rst) begin
@@ -38,44 +45,24 @@ module overlapController(clk);
 			wordIndex = 0;
 		end
 		else begin
-			if(secondSequenceIndex == 0) begin
-				sequencePos <= 2b'01;
-				
-				/*
-				* read memory
-				* 
-				* read [secondSequenceIndex][wordIndex: wordIndex+1]
-				*
-				* write data on the bus
-				*
-				* active the overlapping
-				*/
-			end
-			else begin
-				sequencePos <= 2b'00;
-				
-				/*
-				* read memory
-				* 
-				* read [secondSequenceIndex - 1][(wordIndex + halfWindowSize): (wordIndex + halfWindowSize) + 1] //duas palavras adjacentes
-				* read [secondSequenceIndex][wordIndex: wordIndex+1]
-				*
-				* write data on the bus
-				*
-				* active the overlapping
-				*/
-				
-				
-			end
 			
-			wordIndex = wordIndex + 2; //dois dados lidos por vez
-			if(wordIndex >= halfWindowSize) begin
-				wordIndex = 0;
-				secondSequenceIndex = secondSequenceIndex ++;
-			end
+			if(enable == 1) begin
+				wordIndex = wordIndex + 2;
+				
+				if(wordIndex >= 512) begin
+					secondSequenceIndex = secondSequenceIndex + 1;
+					wordIndex = 0;
+				end
+			
+			end				
 			
 		end
 		
+		secondAddress[9:0] = wordIndex;
+		firstAddress[9:0]  = wordIndex + 512;
+		
+		secondAddress[11:10] = secondSequenceIndex;
+		firstAddress [11:10] = secondSequenceIndex - 1;
 	
 	end
 	

@@ -7,13 +7,13 @@ module memory(clk, save, read, in0, in1, out);
 	input save;
 	input read;
 	
-	input [wordLength - 1 : 0] in0 [1023 : 0];
-	input [wordLength - 1 : 0] in1 [1023 : 0];
+	input [wordLength - 1 : 0] in0;// [1023 : 0];
+	input [wordLength - 1 : 0] in1;// [1023 : 0];
 	
-	output [wordLength - 1 : 0] out [3 : 0];
+	output [wordLength - 1 : 0] out;// [3 : 0];
 	
-	reg [wordLength - 1 : 0] mem0 [1023 : 0];
-	reg [wordLength - 1 : 0] mem1 [1023 : 0];
+	reg [wordLength - 1 : 0] mem0;// [1023 : 0];
+	reg [wordLength - 1 : 0] mem1;// [1023 : 0];
 	
 	
 	
