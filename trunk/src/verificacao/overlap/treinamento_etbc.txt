@@ -1,0 +1,75 @@
+Host: labarc-06.labarc.ufcg.edu.br
+Senha: +(Brazil-MCT)+
+
+Obs:
+	-comando "cds" é para registrar o comando para executar o irun (programa da cadence)
+	-comando "unset ETBC_TLN_DIR" desregistra diretório default para o .tln
+	
+
+Antes das prátiacs começarem devemos definir nosso arquivo .tln
+Um exemplo desse arquivo está na pasta 	UEFS/treinamento_m/pratica1.1/overlap.tln
+	
+
+Pratica 1.1 (necessário ter o arquivo *.tln):
+
+mkdir pratica1.1
+cds
+unset ETBC_TLN_DIR
+etbc overlap.tln trans overlap
+etbc overlap.tln sdi overlap
+etbc overlap.tln pre_source overlap
+etbc overlap.tln sink overlap
+etbc overlap.tln refmod overlap
+etbc overlap.tln tb_single_refmod overlap
+etbc overlap.tln tb_tcl overlap
+etbc overlap.tln Makefile_single_refmod overlap
+make
+(qualquer problema "make clean" antes de fazer make novamente)
+
+
+Pratica 1.2 (necessário ter o arquivo *.tln):
+
+mkdir pratica1.2
+
+cp  pratica1.1/refmod_overlap.svh pratica1.2/
+cp  pratica1.1/sdi.svh pratica1.2/
+cp  pratica1.1/trans.svh pratica1.2/
+cp  pratica1.1/tb.tcl pratica1.2/
+
+etbc ../pratica1.1/overlap.tln source overlap
+etbc ../pratica1.1/overlap.tln checker overlap
+etbc ../pratica1.1/overlap.tln tb_double_refmod overlap
+etbc ../pratica1.1/overlap.tln Makefile_double_refmod overlap
+make
+
+//Salva o arquivo refmod_overlap.svh como refmod_overlap_mutant.svh
+//Modificar o nome da classe em refmod_overlap_mutant.svh para refmod_overlap_mutant
+//Modificar o arquivo tb.sv, adicionar o include da classe mutante e modificar o atributo rem2 para instanciar a classe mutante
+//Obs: tomar cuidado para ambas instancias não trabalharem com um mesmo objeto amostra (vindo da fifo), pois o Source gera um único objeto e envia o mesmo para os dois canais
+make clean
+make
+//Modificar o mutante a fim de testar se o checker realmente funciona ao compara os dois modelos de referencia
+
+Pratica 1.3 (necessário ter o arquivo *.tln):
+
+mkdir pratica1.3
+
+cp pratica1.2/source.svh pratica1.3
+cp pratica1.2/refmod_overlap.svh pratica1.3
+cp pratica1.2/checker.svh pratica1.3
+cp pratica1.2/sdi.svh pratica1.3
+cp pratica1.2/trans.svh pratica1.3
+
+etbc ../pratica1.1/overlap.tln tdriver overlap
+etbc ../pratica1.1/overlap.tln tmonitor overlap
+etbc ../pratica1.1/overlap.tln tdriver_duv overlap
+etbc ../pratica1.1/overlap.tln tmonitor_duv overlap
+etbc ../pratica1.1/overlap.tln in_actor overlap
+etbc ../pratica1.1/overlap.tln out_actor overlap
+etbc ../pratica1.1/overlap.tln duv_emulation overlap
+etbc ../pratica1.1/overlap.tln tb_duv overlap
+etbc ../pratica1.1/overlap.tln top overlap
+etbc ../pratica1.1/overlap.tln top_tcl overlap
+etbc ../pratica1.1/overlap.tln gene_clock overlap
+etbc ../pratica1.1/overlap.tln axi_cover overlap
+etbc ../pratica1.1/overlap.tln Makefile_duv_emulation overlap

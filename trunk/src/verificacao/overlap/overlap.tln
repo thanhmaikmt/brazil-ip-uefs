@@ -1,0 +1,46 @@
+struct overlap_input {
+
+	trans
+	{
+		//barramento de 4 palavras de 16 bits cada
+		int pcmSample1[4];
+		int pcmSample2[4];
+		//bool firstSequence;
+	}
+
+	signals
+	{
+		bool clock;
+		bool reset;
+		bool carregar; //carregar dados
+		bool acionar;
+		//bool firstSequence; //indica se é a última ou primeira janela
+		unsigned[64] pcmSample;
+	}
+
+}
+
+
+
+struct overlap_output {
+
+	trans
+	{ 
+		int pcmSample[4];
+	}
+	signals
+	{
+		unsigned[64] pcmSample;//retorna 4 palavras
+		bool armazenarDados;
+	}
+
+}
+
+
+
+module overlap
+{
+	input overlap_input in_overlap;
+	output overlap_output out_overlap;
+}
+
