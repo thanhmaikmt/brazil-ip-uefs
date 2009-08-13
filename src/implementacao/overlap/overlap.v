@@ -25,7 +25,7 @@
 
 
 
-module overlap(clock, reset, load, action, dataBus);
+module overlap(clock, reset, load, action, dataBus, dataBusOut);
 	
 	parameter wordLength = 16;
 	
@@ -34,6 +34,8 @@ module overlap(clock, reset, load, action, dataBus);
 	input clock, reset, load, action;
 	
 	inout [(busSize - 1):0] dataBus; //sem ponto flutuante
+	
+	output [(busSize - 1):0] dataBusOut; //para debug
 	
 	//output [(busSize - 1):0] dataBusOut;
 	
@@ -48,7 +50,8 @@ module overlap(clock, reset, load, action, dataBus);
 	integer i;
 	integer loadedFirst; //deveria ser algum booleano
 	
-	assign dataBus = action ? dataBusOut : 64'bz;
+	assign dataBus = action? dataBusOut : 64'bz;
+	//assign dataBus = 64'bz;
 	
 	always @(posedge clock or posedge reset)
 	begin
@@ -96,12 +99,12 @@ module overlap(clock, reset, load, action, dataBus);
 				
 				//dataBus <= dataBusOut;
 			end*/
-			
-			dataBusOut[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
-			dataBusOut[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
-			dataBusOut[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
-			dataBusOut[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
 		end
+		
+		dataBusOut[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
+		dataBusOut[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
+		dataBusOut[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
+		dataBusOut[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
 		
 	end
 	
