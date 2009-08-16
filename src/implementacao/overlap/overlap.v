@@ -41,6 +41,7 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 	
 	wire [(busSize - 1):0] dataBus;
 	
+	//so para debug
 	reg [(busSize - 1):0] dataBusOut;
 	
 	reg [(wordLength - 1):0] pcm1 [3:0];
@@ -48,7 +49,7 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 	
 
 	integer i;
-	integer loadedFirst; //deveria ser algum booleano
+	reg loadedFirst; //deveria ser algum booleano
 	
 	assign dataBus = action? dataBusOut : 64'bz;
 	//assign dataBus = 64'bz;
