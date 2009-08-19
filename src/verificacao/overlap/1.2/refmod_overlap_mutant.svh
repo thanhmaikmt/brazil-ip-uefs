@@ -29,11 +29,15 @@ class refmod_overlap_mutant extends ovm_component;
         in_overlap_stim.get(tr_in_in_overlap);
         
         tr_out_out_overlap= new();
-        
-        tr_out_out_overlap.pcmSample[0] = tr_in_in_overlap.pcmSample1[0] + tr_in_in_overlap.pcmSample2[0];
-	 tr_out_out_overlap.pcmSample[1] = tr_in_in_overlap.pcmSample1[1] + tr_in_in_overlap.pcmSample2[1];
-	 tr_out_out_overlap.pcmSample[2] = tr_in_in_overlap.pcmSample1[2] + tr_in_in_overlap.pcmSample2[2];
-	 tr_out_out_overlap.pcmSample[3] = tr_in_in_overlap.pcmSample1[3] + tr_in_in_overlap.pcmSample2[3];
+
+
+
+	tr_out_out_overlap.pcmSample[0] = tr_in_in_overlap.pcmSample1[0] + tr_in_in_overlap.pcmSample2[0];
+	tr_out_out_overlap.pcmSample[1] = tr_in_in_overlap.pcmSample1[1] + tr_in_in_overlap.pcmSample2[1];
+	tr_out_out_overlap.pcmSample[2] = tr_in_in_overlap.pcmSample1[2] + tr_in_in_overlap.pcmSample2[2];
+	tr_out_out_overlap.pcmSample[3] = tr_in_in_overlap.pcmSample1[3] + tr_in_in_overlap.pcmSample2[3];
+
+
 
         crm.sample();
 	out_overlap_stim.put(tr_out_out_overlap);

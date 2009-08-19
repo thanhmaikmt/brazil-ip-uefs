@@ -1,5 +1,5 @@
 irun: 08.10-s008: (c) Copyright 1995-2008 Cadence Design Systems, Inc.
-TOOL:	irun	08.10-s008: Started on Aug 12, 2009 at 12:16:07 BRT
+TOOL:	irun	08.10-s008: Started on Aug 15, 2009 at 18:26:23 BRT
 irun
 	-ovmhome /usr/local/cds/ovm-2.0
 	-input tb.tcl
@@ -107,13 +107,11 @@ Processing file ./tb.sv ...
           Processing file /usr/local/cds/ovm-2.0/src/compatibility/urm_type_compatibility.svh ...
         Processing file /usr/local/cds/ovm-2.0/src/compatibility/urm_meth_compatibility.svh ...
     Processing file sdi.svh ...
-  Processing file pre_source.svh ...
+  Processing file source.svh ...
   Processing file refmod_overlap.svh ...
-  Processing file sink.svh ...
+  Processing file checker.svh ...
 
 file: ./INCA_libs/irun.lnx86.08.10.nc/svpplib/tb.sv
-	module worklib.tb:sv
-		errors: 0, warnings: 0
 		Caching library 'worklib' ....... Done
 	Elaborating the design hierarchy:
 	Top level design units:
@@ -121,17 +119,17 @@ file: ./INCA_libs/irun.lnx86.08.10.nc/svpplib/tb.sv
 	Building instance overlay tables: .................... Done
 	Enabling instrumentation for coverage types: functional
 	Generating native compiled code:
-		worklib.tb:sv <0x6546901a>
-			streams: 2312, words: 5967755
+		worklib.tb:sv <0x3cf1eb82>
+			streams: 2317, words: 5988356
 	Loading native compiled code:     .................... Done
 	Building instance specific data structures.
 	Design hierarchy summary:
 		             Instances  Unique
 		Modules:             1       1
-		Registers:        3633     277
+		Registers:        3638     280
 		Named events:        3       -
 		Always blocks:       1       1
-		Initial blocks:    128      49
+		Initial blocks:    131      52
 		Parallel blocks:    24       3
 	Writing initial simulation snapshot: worklib.tb:sv
 
@@ -140,4 +138,4 @@ Trying to check out license...
 	Incisive_Design_Team_Simulator 8.1 - Failed
 	Incisive_Enterprise_Simulator 8.1 - Failed
 ncsim: *F,NOLICN: Unable to checkout license for the simulation. (flag - 42) 'lic_error -97'.
-TOOL:	irun	08.10-s008: Exiting on Aug 12, 2009 at 12:16:23 BRT  (total: 00:00:16)
+TOOL:	irun	08.10-s008: Exiting on Aug 15, 2009 at 18:26:39 BRT  (total: 00:00:16)

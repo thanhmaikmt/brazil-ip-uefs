@@ -1275,6 +1275,6 @@ LOGFILE_DoubleClick = Edit
 LOGFILE_CustomDoubleClick = 
 UCDB_DoubleClick = Edit
 UCDB_CustomDoubleClick = 
-EditorState = {tabbed horizontal 1} {E:/Projetos/Brazil-IP/brazil-ip-uefs/src/implementacao/overlap/overlap.v 0 1} {{E:\Projetos\Brazil-IP\brazil-ip-uefs\src\implementacao\overlap\tb_overlap.svh} 0 0} {E:/Projetos/Brazil-IP/brazil-ip-uefs/src/implementacao/overlap/converter.sv 0 0}
+EditorState = {tabbed horizontal 1} {E:/Projetos/Brazil-IP/brazil-ip-uefs/src/implementacao/overlap/overlap.v 0 0} {{E:\Projetos\Brazil-IP\brazil-ip-uefs\src\implementacao\overlap\tb_overlap.svh} 0 1} {E:/Projetos/Brazil-IP/brazil-ip-uefs/src/implementacao/overlap/converter.sv 0 0}
 Project_Major_Version = 6
 Project_Minor_Version = 4
