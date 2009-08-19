@@ -12,12 +12,12 @@ class overlap_input extends ovm_object;
     
    rand int pcmSample1; 
    constraint pcmSample1_range {
-     pcmSample1 dist { [0:1] };
+     pcmSample1 dist { [0:65536] };
    }
    
    rand int pcmSample2; 
    constraint pcmSample2_range {
-     pcmSample2 dist { [0:1] };
+     pcmSample2 dist { [0:65536] };
    }
    
 
@@ -56,7 +56,7 @@ class overlap_output extends ovm_object;
     
    rand int pcmSample; 
    constraint pcmSample_range {
-     pcmSample dist { [0:1] };
+     pcmSample dist { [0:65536] };
    }
    
 

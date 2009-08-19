@@ -38,7 +38,7 @@
 
 set_global_assignment -name FAMILY APEX20KE
 set_global_assignment -name DEVICE AUTO
-set_global_assignment -name TOP_LEVEL_ENTITY overlap
+set_global_assignment -name TOP_LEVEL_ENTITY overlapController
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 9.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "10:41:27  JULY 28, 2009"
 set_global_assignment -name LAST_QUARTUS_VERSION 9.0
@@ -52,4 +52,5 @@ set_global_assignment -name VERILOG_FILE overlapController.v
 set_global_assignment -name VERILOG_FILE memory.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE overlapController.vwf
 set_global_assignment -name SIMULATION_MODE TIMING
-set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE overlap.vwf
+set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE overlapController.vwf
+set_global_assignment -name END_TIME "25 ms"

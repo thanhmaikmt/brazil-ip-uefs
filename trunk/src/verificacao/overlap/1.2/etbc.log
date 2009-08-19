@@ -20,7 +20,11 @@ WRITE TEXT BEGIN
 
 WRITE TEXT END:
 
-cov_work : tb.sv trans.svh pre_source.svh refmod_
+cov_work : .tb_cpld
+	rm -rf cov_work; irun -ovmhome /usr/local/cds/ovm-2.0 -input tb.tcl -access +r -coverage functional tb.sv
+
+
+.tb_cpld : tb.sv trans.svh source.svh refmod_
 
 $$(module.name) BEGIN
 
@@ -28,8 +32,8 @@ $$(module.name) END:overlap
 
 WRITE TEXT BEGIN
 
-WRITE TEXT END:.svh sink.svh 
-	rm -rf cov_work; irun -ovmhome /usr/local/cds/ovm-2.0 -input tb.tcl -access +r -coverage functional tb.sv
+WRITE TEXT END:.svh checker.svh 
+	irun -ovmhome /usr/local/cds/ovm-2.0 -compile tb.sv && touch .tb_cpld
 
 clean :
 	rm -rf cov_work INCA_libs .tb_cpld
