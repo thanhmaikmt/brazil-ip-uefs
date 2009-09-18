@@ -19,12 +19,12 @@ converter conv = new("conv");
 
 integer bus_0, bus_1, bus_2, bus_3;
 
-integer pcm1_0, pcm1_1, pcm1_2, pcm1_3;
-integer pcm2_0, pcm2_1, pcm2_2, pcm2_3;
+integer pcm1_0 = 0, pcm1_1 = 0, pcm1_2 = 0, pcm1_3 = 0;
+integer pcm2_0 = 0, pcm2_1 = 0, pcm2_2 = 0, pcm2_3 = 0;
 
 
 //valores de entrada
-wire [63:0] dataBus;
+wire [63:0] dataBusIn;
 reg [63:0] dataBusTemp;
 bit [63:0] dataBusOut;
 
@@ -37,20 +37,47 @@ bit [15:0] out3;
 //valores usados para comparação de resultados
 integer pcm_out_0, pcm_out_1, pcm_out_2, pcm_out_3;
 
-integer pcm_ref_0, pcm_ref_1, pcm_ref_2, pcm_ref_3;
+bit [15:0] pcm_ref_0, pcm_ref_1, pcm_ref_2, pcm_ref_3;
 
 reg loadedFirst;
 
 integer i;
 
 //instância do overlap
-overlap over(clock, reset, load, action, dataBus, dataBusOut);
+overlap over(clock, reset, load, action, dataBusIn, dataBusOut);
 
-assign dataBus = action?64'bz:dataBusTemp;
+
+//o que eh isso?
+//assign dataBus = action?64'bz:dataBusTemp;
+assign dataBusIn = dataBusTemp;
 
 always @(posedge clock) begin
-  reset =0;
+  
   /****************Modelo de Referência*******************/
+  if(action)begin
+    pcm_ref_0 = pcm1_0 + pcm2_0;
+   
+    pcm_ref_1 = pcm1_1 + pcm2_1;
+   
+    pcm_ref_2 = pcm1_2 + pcm2_2;
+   
+    pcm_ref_3 = pcm1_3 + pcm2_3;
+    
+    if(~load) begin
+      loadedFirst = 0;
+    end;
+  end
+  else begin
+    pcm_ref_0 = 16'bz;
+    
+    pcm_ref_1 = 16'bz;
+    
+    pcm_ref_2 = 16'bz;
+    
+    pcm_ref_3 = 16'bz;
+    
+  end
+
   if(load)begin
     if(loadedFirst == 0) begin
       pcm1_0 = bus_0;
@@ -74,18 +101,7 @@ always @(posedge clock) begin
       loadedFirst = 0;
     end
   end
-   
-  if(action)begin
-    pcm_ref_0 = pcm1_0 + pcm2_0;
-   
-    pcm_ref_1 = pcm1_1 + pcm2_1;
-   
-    pcm_ref_2 = pcm1_2 + pcm2_2;
-   
-    pcm_ref_3 = pcm1_3 + pcm2_3;
-    
-    loadedFirst = 0;
-  end
+
   /****************Modelo de Referência*******************/
  
  
@@ -118,9 +134,10 @@ always @(posedge clock) begin
   $display("valores 3: refMod = %d e overlap = %d", pcm_ref_3, pcm_out_3);
   
   /***************MOSTRA RESULTADOS***********************/
- 
- 
-
+  
+  
+  
+  
   /******************Gera Valores**********************/
   //gera valores
   bus_0 = $random %65536;
@@ -132,22 +149,24 @@ always @(posedge clock) begin
   $display("valor bus_3 %d, valor bus_2 %d, valor bus_1 %d, valor bus_0 %d",
 				bus_3, bus_2, bus_1, bus_0);
  
- 
- 
   //converte valores para binário e acopla eles para a entrada
   dataBusTemp = {conv.decToBin(bus_3), conv.decToBin(bus_2), conv.decToBin(bus_1), conv.decToBin(bus_0)};
   
-  //dataBus = action?64'bz:dataBusTemp;
-  
-  //action? dataBusOut : 64'bz
-  $display("valor dataBus %b", dataBus);
+  //dataBusIn = action?64'bz:dataBusTemp;
+  $display("valor dataBusIn %b", dataBusIn);
  
- //carregar os dados primeiro
+  //carregar os dados primeiro
  
   action = $random %2;
+  //action = 0;
   load = $random %2;
-  /******************Calcula Valores**********************/
- 
+  //load = 1;
+  
+  reset = 0;
+  
+  /******************Gera Valores**********************/
+  
+  
 end
 
 endmodule

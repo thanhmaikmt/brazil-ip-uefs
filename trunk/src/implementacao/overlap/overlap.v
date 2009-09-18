@@ -25,7 +25,7 @@
 
 
 
-module overlap(clock, reset, load, action, dataBus, dataBusOut);
+module overlap(clock, reset, load, action, dataBusIn, dataBusOut);
 	
 	parameter wordLength = 16;
 	
@@ -33,16 +33,17 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 	
 	input clock, reset, load, action;
 	
-	inout [(busSize - 1):0] dataBus; //sem ponto flutuante
+	//era inout mas não deu para fazer a verificação
+	//inout [(busSize - 1):0] dataBus; //sem ponto flutuante
 	
+	input [(busSize - 1):0] dataBusIn;
 	output [(busSize - 1):0] dataBusOut; //para debug
 	
-	//output [(busSize - 1):0] dataBusOut;
-	
-	wire [(busSize - 1):0] dataBus;
+	wire [(busSize - 1):0] dataBusIn;
+	wire [(busSize - 1):0] dataBusOut;
 	
 	//so para debug
-	reg [(busSize - 1):0] dataBusOut;
+	reg [(busSize - 1):0] dataBusTemp;
 	
 	reg [(wordLength - 1):0] pcm1 [3:0];
 	reg [(wordLength - 1):0] pcm2 [3:0];
@@ -51,7 +52,7 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 	integer i;
 	reg loadedFirst; //deveria ser algum booleano
 	
-	assign dataBus = action? dataBusOut : 64'bz;
+	assign dataBusOut = action? dataBusTemp : 64'bz;
 	//assign dataBus = 64'bz;
 	
 	always @(posedge clock or posedge reset)
@@ -70,14 +71,19 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 				//primeiros valores foram carregados
 				if(loadedFirst == 0) begin
 				
-					pcm1[0] <= dataBus[((0+1) * wordLength) - 1: 0 * wordLength];
-					pcm1[1] <= dataBus[((1+1) * wordLength) - 1: 1 * wordLength];
-					pcm1[2] <= dataBus[((2+1) * wordLength) - 1: 2 * wordLength];
-					pcm1[3] <= dataBus[((3+1) * wordLength) - 1: 3 * wordLength];
+					pcm1[0] <= dataBusIn[((0+1) * wordLength) - 1: 0 * wordLength];
+					pcm1[1] <= dataBusIn[((1+1) * wordLength) - 1: 1 * wordLength];
+					pcm1[2] <= dataBusIn[((2+1) * wordLength) - 1: 2 * wordLength];
+					pcm1[3] <= dataBusIn[((3+1) * wordLength) - 1: 3 * wordLength];
 					/*for(i = 0; i < 4; i = i + 1) begin
 						pcm1[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
 						pcm2[i] <= 16'b0000000000000000;
 					end*/
+					
+					pcm2[0] <= 0;
+					pcm2[1] <= 0;
+					pcm2[2] <= 0;
+					pcm2[3] <= 0;
 					
 					loadedFirst <= 1;
 				end
@@ -85,27 +91,24 @@ module overlap(clock, reset, load, action, dataBus, dataBusOut);
 					/*for(i = 0; i < 4; i = i + 1) begin
 						pcm2[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
 					end*/
-					pcm2[0] <= dataBus[((0+1) * wordLength) - 1: 0 * wordLength];
-					pcm2[1] <= dataBus[((1+1) * wordLength) - 1: 1 * wordLength];
-					pcm2[2] <= dataBus[((2+1) * wordLength) - 1: 2 * wordLength];
-					pcm2[3] <= dataBus[((3+1) * wordLength) - 1: 3 * wordLength];
+					pcm2[0] <= dataBusIn[((0+1) * wordLength) - 1: 0 * wordLength];
+					pcm2[1] <= dataBusIn[((1+1) * wordLength) - 1: 1 * wordLength];
+					pcm2[2] <= dataBusIn[((2+1) * wordLength) - 1: 2 * wordLength];
+					pcm2[3] <= dataBusIn[((3+1) * wordLength) - 1: 3 * wordLength];
 					
 					loadedFirst <= 0;
 				end
 			end
-			/*else if(action) begin
-				/ *for(i = 0; i < 4; i = i + 1) begin
-					dataBusOut[((i+1) * wordLength) - 1: i * wordLength] <= pcm1[i] + pcm2[i];
-				end * /
-				
-				//dataBus <= dataBusOut;
-			end*/
 		end
 		
-		dataBusOut[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
-		dataBusOut[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
-		dataBusOut[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
-		dataBusOut[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
+		if(action && ~load) begin
+      loadedFirst <= 0;
+		end
+		  
+		dataBusTemp[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
+		dataBusTemp[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
+		dataBusTemp[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
+		dataBusTemp[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
 		
 	end
 	
