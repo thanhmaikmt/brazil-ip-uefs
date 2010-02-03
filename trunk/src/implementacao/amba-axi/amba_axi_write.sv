@@ -38,6 +38,12 @@ module amba_axi_write(aclk, aresetn,
 	
 	input aclk, aresetn;
 	
+	//data and address from aac
+	input [31:0] aacaddr;
+	input [31:0] aacdata;
+	input aacaddrvalid;
+	input aacdatavalid;
+	
 	//write address ready
 	input awready;
 	
@@ -92,6 +98,11 @@ module amba_axi_write(aclk, aresetn,
 	
 	wire aclk, aresetn;
 	
+	wire [31:0] aacaddr;
+	wire [31:0] aacdata;
+	wire aacaddrvalid;
+	wire aacdatavalid;
+	
 	wire awready;
 	
 	wire wready;
@@ -101,36 +112,65 @@ module amba_axi_write(aclk, aresetn,
 	wire bvalid;
 	
 	wire [3:0] awid;
-	wire [31:0] awaddr;
+	reg [31:0] awaddr;
 	wire [3:0] awlen;
 	wire [2:0] awsize;
 	wire [1:0] awburst;
 	wire [1:0] awlock;
 	wire [3:0] awcache;
 	wire [2:0] awprot;
-	wire awvalid
+	reg awvalid
 	
 	wire [3:0] wid;
-	wire [31:0] wdata;
+	reg [31:0] wdata;
 	wire [3:0] wstrb;
 	wire wlast;
-	wire wvalid;
+	reg wvalid;
 	
-	wire bready;
+	reg bready;
 	
 	assign awlock = 2'b00;
 	
 	assign awcache = 4'b0001;
 
 	assign awprot = 3'b010;
-		
-
 
 	
-	always @(posedge clock or posedge reset)
+	always @(posedge aclk or posedge aresetn)
 	begin
+		if(~aresetn)begin
+			awid = 4'b0000;
+			awaddr = 32'b0;
+			awlen = ;//ver melhor
+			awsize;
+			awburst;
+			awvalid = 1'b0;
+			wid;
+			wdata = 32'b0;
+			wstrb;
+			wlast;
+			wvalid = 1'b0;
+			bready = 1'b0;
 		
-		
+		end
+		else begin
+			//debulha
+
+			if(/*aguardando dados*/)begin
+				if(aacaddrvalid)begin
+					awaddr = aacaddr;
+				end
+
+				if(aacdatavalid)begin
+					wdata = aacdata;
+				end
+			
+			end
+			
+			if(/*enviando*/)begin
+				
+			end
+		end
 	end
 	
 endmodule
