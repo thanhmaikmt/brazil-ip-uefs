@@ -22,6 +22,7 @@
 
 
 module amba_axi_write(aclk, aresetn,
+		aacaddr, aacdata, aacaddrvalid, aacdatavalid,
 		awready,
 		wready,
 		bid, bresp, bvalid,
@@ -29,6 +30,10 @@ module amba_axi_write(aclk, aresetn,
 		awid, awaddr, awlen, awsize, awburst, awlock, awcache, awprot, awvalid,
 		wid, wdata, wstrb, wlast, wvalid,
 		bready);
+	
+	parameter IDLE = 2'b00;
+	parameter WAITING_AAC = 2'b01;
+	parameter SENDING = 2'b11;
 	
 	parameter wordLength = 16;
 	
@@ -129,14 +134,20 @@ module amba_axi_write(aclk, aresetn,
 	
 	reg bready;
 	
+	reg [1:0] statemachine; 
+	
+	reg waitingdata, waitingaddr;
+	
+	
 	assign awlock = 2'b00;
 	
 	assign awcache = 4'b0001;
 
 	assign awprot = 3'b010;
-
 	
-	always @(posedge aclk or posedge aresetn)
+	
+	
+	always @(posedge aclk or negedge aresetn)
 	begin
 		if(~aresetn)begin
 			awid = 4'b0000;
@@ -151,24 +162,57 @@ module amba_axi_write(aclk, aresetn,
 			wlast;
 			wvalid = 1'b0;
 			bready = 1'b0;
-		
+			
+			statemachine = IDLE;
+			waitingaddr = 1'b1;
+			waitingdata = 1'b1;
 		end
 		else begin
 			//debulha
-
-			if(/*aguardando dados*/)begin
+			
+			/*aguardando dados*/
+			if(statemachine == WAITING_AAC)begin
 				if(aacaddrvalid)begin
 					awaddr = aacaddr;
+					waitingaddr = 1'b0;
 				end
 
 				if(aacdatavalid)begin
 					wdata = aacdata;
+					waitingdata = 1'b0;
 				end
-			
-			end
-			
-			if(/*enviando*/)begin
 				
+				if(~waitingaddr && ~waitingdata)begin
+					awvalid = 1'b1;
+					statemachine = SENDING;
+				end
+			end
+				
+			/*enviando*/
+			if(statemachine == SENDING) begin
+				
+				if(awvalid = 1'b1)begin
+					/*slave já recebeu endereço*/
+					if(awready = 1'b1)begin
+						awvalid = 1'b0;
+						wvalid  = 1'b1; //envia dado
+					end
+				end
+				else if(wvalid = 1'b1)begin
+					/*slave já recebeu dado*/
+					if(awready = 1'b1)begin
+						wvalid  = 1'b0;
+					end
+				end
+				
+				/*slave tem a resposta*/
+				if(bvalid)begin
+					statemachine = IDLE;
+				end
+				
+				waitingaddr = 1'b1;
+				waitingdata = 1'b1;
+
 			end
 		end
 	end
