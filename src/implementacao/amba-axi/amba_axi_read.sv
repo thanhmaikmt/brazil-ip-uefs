@@ -92,17 +92,16 @@ module amba_axi_read(aclk, aresetn,
 	reg aacdatavalid;
 	
 	wire arready;
-	
-	wire wready;
+
 	
 	wire [3:0] arid;
 	reg [31:0] araddr;
 	wire [3:0] arlen;
 	wire [2:0] arsize;
 	wire [1:0] arburst;
-	wire [1:0] awlock;
-	wire [3:0] awcache;
-	wire [2:0] awprot;
+	wire [1:0] arlock;
+	wire [3:0] arcache;
+	wire [2:0] arprot;
 	reg arvalid;
 	
 	wire [3:0] rid;
