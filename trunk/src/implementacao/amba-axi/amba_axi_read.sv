@@ -5,120 +5,192 @@
 ------------------------------------------------------------------------ */
 
 /*-------------------------------------------------------------------------------
-* parameter int HALF_WINDOW_SIZE = 512;
-*
-* função utilizada na verificação
-* function void overlap(int sequencePos,
-* 						int pcm_in_1[(HALF_WINDOW_SIZE-1):0],
-* 						int pcm_in_2[(HALF_WINDOW_SIZE-1):0],
-*						ref int pcm_out[(HALF_WINDOW_SIZE-1):0]);
 *
 *
-* pcm_in_1 - ultima metade da primeira seqüência
-* pcm_in_2 - primeira metada da segunda seqüência
-* pcm_out - saída
--------------------------------------------------------------------------------*/
+*
+------------------------------------------------------*/
 
 
 
-module amba_axi_read(aclk, aresetn, awid, awaddr, dataBusIn, dataBusOut);
+module amba_axi_read(aclk, aresetn,
+		aacaddr, aacaddrvalid,
+		arready,
+		rid, rdata, rresp, rlast, rvalid,
+		
+		aacdata, aacdatavalid,
+		arid, araddr, arlen, arsize, arburst, arlock, arcache, arprot, arvalid,
+		rready);
 	
-	parameter wordLength = 16;
 	
-	parameter busSize = 4 * wordLength;
+	parameter IDLE = 2'b00;			//aguardando aac
+	parameter REQUEST = 2'b01;		//enviando endereço
+	parameter WAITING_AMBA = 2'b11;	//aguardando resposta do amba
+	parameter RECEIVING = 2'b10;	//recebendo dado
+	
+
+	//IN
 	
 	input aclk, aresetn;
 	
-	//
-	input [3:0] awid;
-	input [31:0] awaddr;
+	//address from aac
+	input [31:0] aacaddr;
+	input aacaddrvalid;
+	
+	//read address ready
+	input arready;
+	
+	//real id
+	input [3:0] rid;
+	
+	//read data
+	input [31:0] rdata;
+	
+	//read response
+	input [1:0] rresp;
+	
+	//read last
+	input rlast;
+	
+	//read valid
+	input rvalid;
 	
 	
+	//OUT
 	
+	//data to aac
+	output [31:0] aacdata;
+	output aacdatavalid;
 	
+	//read address id
+	output [3:0] arid;
+	//read address
+	output [31:0] araddr;
+	//burst length
+	output [3:0] arlen;
+	//burst size
+	output [2:0] arsize;
+	//burst type
+	output [1:0] arburst;
+	//lock type
+	output [1:0] arlock;
+	//cache type
+	output [3:0] arcache;
+	//protection type
+	output [2:0] arprot;
+	//write address valid
+	output arvalid;
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	input [(busSize - 1):0] dataBusIn;
-	output [(busSize - 1):0] dataBusOut; //para debug
-	
-	wire [3:0] awid;
-	wire [(busSize - 1):0] dataBusOut;
-	
-	//so para debug
-	reg [(busSize - 1):0] dataBusTemp;
-	
-	reg [(wordLength - 1):0] pcm1 [3:0];
-	reg [(wordLength - 1):0] pcm2 [3:0];
-	
+	output rready;
 
-	integer i;
-	reg loadedFirst; //deveria ser algum booleano
+	//WIRES
 	
-	assign dataBusOut = action? dataBusTemp : 64'bz;
-	//assign dataBus = 64'bz;
+	wire aclk, aresetn;
 	
-	always @(posedge clock or posedge reset)
+	wire [31:0] aacaddr;
+	reg [31:0] aacdata;
+	wire aacaddrvalid;
+	reg aacdatavalid;
+	
+	wire arready;
+	
+	wire wready;
+	
+	wire [3:0] arid;
+	reg [31:0] araddr;
+	wire [3:0] arlen;
+	wire [2:0] arsize;
+	wire [1:0] arburst;
+	wire [1:0] awlock;
+	wire [3:0] awcache;
+	wire [2:0] awprot;
+	reg arvalid;
+	
+	wire [3:0] rid;
+	wire [31:0] rdata;
+	wire [3:0] rstrb;
+	wire rlast;
+	wire rvalid;
+	
+	reg rready;
+	
+	reg [1:0] statemachine;
+	
+	 
+
+	assign arlock = 2'b00;
+	assign arcache = 4'b0001;
+	assign arprot = 3'b010;
+
+	//definir melhor estes valores
+	assign arid = 4'b0000;
+	assign arsize = 2;
+	assign arlen = 1;
+	assign arburst= 2'b00;
+
+	
+	always @(posedge aclk or negedge aresetn)
 	begin
-		if(reset) begin
-			for(i = 0; i < 4; i = i + 1) begin
-				pcm1[i] <= 16'b0000000000000000;
-				pcm2[i] <= 16'b0000000000000000;
-			end
+		if(~aresetn)begin
+			arvalid = 1'b0;
+			araddr = 32'b0;
+			rready = 1'b0;
 			
-			loadedFirst <= 0;
-			
+			statemachine = IDLE;
 		end
 		else begin
-			if(load) begin
-				//primeiros valores foram carregados
-				if(loadedFirst == 0) begin
-				
-					pcm1[0] <= dataBusIn[((0+1) * wordLength) - 1: 0 * wordLength];
-					pcm1[1] <= dataBusIn[((1+1) * wordLength) - 1: 1 * wordLength];
-					pcm1[2] <= dataBusIn[((2+1) * wordLength) - 1: 2 * wordLength];
-					pcm1[3] <= dataBusIn[((3+1) * wordLength) - 1: 3 * wordLength];
-					/*for(i = 0; i < 4; i = i + 1) begin
-						pcm1[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
-						pcm2[i] <= 16'b0000000000000000;
-					end*/
+			//debulha
+			
+			//aguardando
+			if(statemachine == IDLE)begin
+				if(aacaddrvalid)begin
+					araddr = aacaddr;
+					arvalid = 1'b1; //endereço válido
 					
-					pcm2[0] <= 0;
-					pcm2[1] <= 0;
-					pcm2[2] <= 0;
-					pcm2[3] <= 0;
+					statemachine = REQUEST;
 					
-					loadedFirst <= 1;
-				end
-				else begin
-					/*for(i = 0; i < 4; i = i + 1) begin
-						pcm2[i] <= dataBusIn[((i+1) * wordLength) - 1: i * wordLength];
-					end*/
-					pcm2[0] <= dataBusIn[((0+1) * wordLength) - 1: 0 * wordLength];
-					pcm2[1] <= dataBusIn[((1+1) * wordLength) - 1: 1 * wordLength];
-					pcm2[2] <= dataBusIn[((2+1) * wordLength) - 1: 2 * wordLength];
-					pcm2[3] <= dataBusIn[((3+1) * wordLength) - 1: 3 * wordLength];
 					
-					loadedFirst <= 0;
+					//verificar qd eh melhor resetar estes valores
+					aacdata = 32'b0;
+					aacdatavalid = 1'b0;
 				end
 			end
+			
+			//requisitando dados
+			if(statemachine == REQUEST)begin
+				if(arready)begin
+					arvalid = 1'b0;
+					
+					rready = 1'b1;
+					statemachine = WAITING_AMBA;
+				end
+			end
+			
+			
+			//aguardando resposta do amba_axi
+			if(statemachine == WAITING_AMBA)begin
+				if(rvalid)begin
+					statemachine = RECEIVING;
+				end
+			end
+			
+			
+			
+			/*recebendo*/
+			if(statemachine == RECEIVING) begin
+				aacdata = rdata;
+				aacdatavalid = 1'b1;
+				
+				/*verificar qts ciclos ira manter o dado lido no barramento
+				* caso seja maior que um acrescentar contador
+				*/
+				statemachine = IDLE;
+
+				//reset
+				arvalid = 1'b0;
+				araddr = 32'b0;
+				rready = 1'b0;
+			end
 		end
-		
-		if(action && ~load) begin
-      loadedFirst <= 0;
-		end
-		  
-		dataBusTemp[((0+1) * wordLength) - 1: 0 * wordLength] <= pcm1[0] + pcm2[0];
-		dataBusTemp[((1+1) * wordLength) - 1: 1 * wordLength] <= pcm1[1] + pcm2[1];
-		dataBusTemp[((2+1) * wordLength) - 1: 2 * wordLength] <= pcm1[2] + pcm2[2];
-		dataBusTemp[((3+1) * wordLength) - 1: 3 * wordLength] <= pcm1[3] + pcm2[3];
-		
 	end
 	
 endmodule

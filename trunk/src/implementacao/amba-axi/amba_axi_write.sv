@@ -5,18 +5,9 @@
 ------------------------------------------------------------------------ */
 
 /*-------------------------------------------------------------------------------
-* parameter int HALF_WINDOW_SIZE = 512;
-*
-* função utilizada na verificação
-* function void overlap(int sequencePos,
-* 						int pcm_in_1[(HALF_WINDOW_SIZE-1):0],
-* 						int pcm_in_2[(HALF_WINDOW_SIZE-1):0],
-*						ref int pcm_out[(HALF_WINDOW_SIZE-1):0]);
 *
 *
-* pcm_in_1 - ultima metade da primeira seqüência
-* pcm_in_2 - primeira metada da segunda seqüência
-* pcm_out - saída
+*
 -------------------------------------------------------------------------------*/
 
 
@@ -31,13 +22,11 @@ module amba_axi_write(aclk, aresetn,
 		wid, wdata, wstrb, wlast, wvalid,
 		bready);
 	
-	parameter IDLE = 2'b00;
-	parameter WAITING_AAC = 2'b01;
-	parameter SENDING = 2'b11;
+	parameter IDLE = 2'b00; 		//aguardando aac
+	parameter REQUEST = 2'b01;		//enviando endereço
+	parameter SENDING = 2'b11;		//enviando dado
+	parameter WAITING_AMBA = 2'b10; //aguardando resposta do amba
 	
-	parameter wordLength = 16;
-	
-	parameter busSize = 4 * wordLength;
 	
 	//IN
 	
@@ -81,7 +70,7 @@ module amba_axi_write(aclk, aresetn,
 	//protection type
 	output [2:0] awprot;
 	//write address valid
-	output awvalid
+	output awvalid;
 	
 	
 	//write id
@@ -124,7 +113,7 @@ module amba_axi_write(aclk, aresetn,
 	wire [1:0] awlock;
 	wire [3:0] awcache;
 	wire [2:0] awprot;
-	reg awvalid
+	reg awvalid;
 	
 	wire [3:0] wid;
 	reg [31:0] wdata;
@@ -136,84 +125,79 @@ module amba_axi_write(aclk, aresetn,
 	
 	reg [1:0] statemachine; 
 	
-	reg waitingdata, waitingaddr;
 	
 	
 	assign awlock = 2'b00;
-	
 	assign awcache = 4'b0001;
-
 	assign awprot = 3'b010;
 	
+	//definir melhor estes valores
+	assign awid = 4'b0000;
+	assign awsize = 2;
+	assign awlen = 1;
+	assign awburst= 2'b00;
+	assign wid = 4'b0001;
+	assign wstrb = 0; //?
 	
+	assign wlast = 1;//alterado somente se awlen > 1
 	
 	always @(posedge aclk or negedge aresetn)
 	begin
 		if(~aresetn)begin
-			awid = 4'b0000;
 			awaddr = 32'b0;
-			awlen = ;//ver melhor
-			awsize;
-			awburst;
 			awvalid = 1'b0;
-			wid;
 			wdata = 32'b0;
-			wstrb;
-			wlast;
+
 			wvalid = 1'b0;
 			bready = 1'b0;
 			
 			statemachine = IDLE;
-			waitingaddr = 1'b1;
-			waitingdata = 1'b1;
 		end
 		else begin
 			//debulha
 			
-			/*aguardando dados*/
-			if(statemachine == WAITING_AAC)begin
+			//aguardando
+			if(statemachine == IDLE)begin
 				if(aacaddrvalid)begin
 					awaddr = aacaddr;
-					waitingaddr = 1'b0;
+					awvalid = 1'b1; //endereço válido
+					
+					statemachine = REQUEST;
 				end
-
-				if(aacdatavalid)begin
+			end
+			
+			//requisitando envio de dados
+			if(statemachine == REQUEST)begin
+				if(awready)begin
+					awvalid = 1'b0;
+				end
+				if(aacdatavalid && ~awvalid)begin
 					wdata = aacdata;
-					waitingdata = 1'b0;
-				end
-				
-				if(~waitingaddr && ~waitingdata)begin
-					awvalid = 1'b1;
+					wvalid = 1'b1;
+					
 					statemachine = SENDING;
 				end
 			end
-				
-			/*enviando*/
-			if(statemachine == SENDING) begin
-				
-				if(awvalid = 1'b1)begin
-					/*slave já recebeu endereço*/
-					if(awready = 1'b1)begin
-						awvalid = 1'b0;
-						wvalid  = 1'b1; //envia dado
-					end
+			
+			//enviando dado
+			if(statemachine == SENDING)begin
+				if(wready)begin
+					wvalid = 1'b0;
+					bready = 1'b1;
+					
+					statemachine = WAITING_AMBA;
 				end
-				else if(wvalid = 1'b1)begin
-					/*slave já recebeu dado*/
-					if(awready = 1'b1)begin
-						wvalid  = 1'b0;
-					end
-				end
-				
-				/*slave tem a resposta*/
+			end
+						
+			if(statemachine == WAITING_AMBA)begin
 				if(bvalid)begin
+					wvalid = 1'b0;
+					bready = 1'b0;
+					
 					statemachine = IDLE;
 				end
-				
-				waitingaddr = 1'b1;
-				waitingdata = 1'b1;
-
 			end
+			
 		end
 	end
 	
