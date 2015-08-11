@@ -1,0 +1,1 @@
+Este projeto visa a implementação de um decodificador de áudio AAC com perfil de baixa complexidade (LC) para o padrão MPEG-2, seguindo a norma ISO-IEC 13818-7.
